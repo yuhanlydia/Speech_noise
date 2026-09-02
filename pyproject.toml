@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "speech-noise-sar"
+version = "0.1.0"
+description = "Selective Acoustic Relevance experiments for speech/audio language models"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.26",
+  "pydantic>=2.6",
+  "PyYAML>=6.0",
+  "soundfile>=0.12",
+  "torch>=2.2",
+]
+
+[project.scripts]
+sar-gpu = "sar.gpu_smoke:main"
+
+[project.optional-dependencies]
+gpu = ["transformers>=4.51", "accelerate>=1.0", "bitsandbytes>=0.45"]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]

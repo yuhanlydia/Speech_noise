@@ -1,0 +1,5 @@
+name: static_gate
+layers: [0]
+router_dim: 1
+lambda_switch: 1.0
+lambda_identity: 0.1
