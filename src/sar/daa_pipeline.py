@@ -13,10 +13,6 @@ class DAAStageError(RuntimeError):
         self.stage = stage
 
 
-def _block_overlaps_span(block: AcousticBlock, start_s: float, end_s: float) -> bool:
-    return max(block.start_s, start_s) < min(block.end_s, end_s)
-
-
 def _event_selected(record, blocks: Sequence[AcousticBlock], selected_ids: Sequence[str]) -> bool | None:
     if not getattr(record, "source_mask_valid", False):
         return None
@@ -24,10 +20,10 @@ def _event_selected(record, blocks: Sequence[AcousticBlock], selected_ids: Seque
     end_s = getattr(record, "source_end_s", None)
     if start_s is None or end_s is None:
         return None
+    midpoint = (float(start_s) + float(end_s)) / 2.0
     selected = set(selected_ids)
     return any(
-        block.block_id in selected
-        and _block_overlaps_span(block, float(start_s), float(end_s))
+        block.block_id in selected and block.start_s <= midpoint < block.end_s
         for block in blocks
     )
 
