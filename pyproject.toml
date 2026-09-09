@@ -20,6 +20,7 @@ sar-gpu = "sar.gpu_smoke:main"
 
 [project.optional-dependencies]
 gpu = ["transformers>=4.51", "accelerate>=1.0", "bitsandbytes>=0.45"]
+data = ["datasets>=3.0", "huggingface_hub>=0.30"]
 dev = ["pytest>=8.0"]
 
 [tool.setuptools.packages.find]
