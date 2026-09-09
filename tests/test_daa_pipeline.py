@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from sar.daa_pipeline import run_daa_pair, summarize_daa_rows
+from sar.daa_pipeline import _event_selected, run_daa_pair, summarize_daa_rows
 from sar.data.blocks import AcousticBlock
 from sar.models.base import OptionScores
 
@@ -93,3 +93,27 @@ def test_pipeline_declares_blocks_once_and_switches_focus_by_query():
     assert summary['selection_switch_acc'] == 1.0
     assert summary['pair_switch_acc'] == 1.0
     assert summary['reasoning_acc_given_use_selection'] == 1.0
+
+
+def test_event_selection_requires_event_midpoint_not_tiny_overlap():
+    record = Record(
+        pair_id='p2',
+        role='use',
+        waveform_path='/x.wav',
+        waveform_sha256='def',
+        query='animal?',
+        answer='B',
+        options=['A', 'B', 'C', 'D'],
+        source_start_s=0.95,
+        source_end_s=1.55,
+        source_mask_valid=True,
+    )
+    blocks = [
+        AcousticBlock('B1', 0.0, 1.0, 'speech'),
+        AcousticBlock('B2', 1.0, 2.0, 'dog bark'),
+    ]
+    # B1 overlaps only the first 0.05 s of the event. Selection is credited only
+    # to the block containing the event midpoint (1.25 s), so edge overlap cannot
+    # inflate selection accuracy.
+    assert _event_selected(record, blocks, ['B1']) is False
+    assert _event_selected(record, blocks, ['B2']) is True
