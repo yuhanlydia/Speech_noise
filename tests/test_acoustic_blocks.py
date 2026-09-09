@@ -34,6 +34,17 @@ def test_parse_declared_blocks_rejects_overlap():
         parse_audio_blocks(text, duration_s=2.0, max_blocks=4)
 
 
+def test_parse_declared_blocks_rejects_large_uncovered_suffix():
+    text = (
+        '<audio_blocks>\n'
+        'B1|0.00|1.00|speech\n'
+        'B2|1.00|1.40|bark\n'
+        '</audio_blocks>'
+    )
+    with pytest.raises(ValueError, match='cover'):
+        parse_audio_blocks(text, duration_s=2.0, max_blocks=4)
+
+
 def test_fixed_blocks_cover_duration_without_overflow():
     blocks = fixed_temporal_blocks(3.2, block_seconds=1.5, max_blocks=4)
     assert [(b.start_s, b.end_s) for b in blocks] == [
