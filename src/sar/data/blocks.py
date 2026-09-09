@@ -42,13 +42,27 @@ def validate_blocks(blocks: Sequence[AcousticBlock], *, duration_s: float, max_b
     ids = [b.block_id for b in blocks]
     if len(set(ids)) != len(ids):
         raise ValueError("duplicate block ids are not allowed")
+
+    # The declared block table is DAA's address space. If it omits a large
+    # region, the runtime would silently treat undeclared audio as unselected.
+    # Require a near-complete partition so segmentation omissions are visible
+    # protocol failures rather than hidden sources of apparent improvement.
+    coverage_tolerance_s = min(0.25, max(0.05, 0.05 * float(duration_s)))
+    if blocks[0].start_s > coverage_tolerance_s:
+        raise ValueError("declared blocks do not cover the audio start")
+
     previous_end = 0.0
     for i, block in enumerate(blocks):
         if block.end_s > duration_s + 1e-6:
             raise ValueError(f"block {block.block_id} ends beyond audio duration")
         if i and block.start_s < previous_end - 1e-6:
             raise ValueError(f"block {block.block_id} overlap detected")
+        if i and block.start_s - previous_end > coverage_tolerance_s:
+            raise ValueError("declared blocks do not cover the audio continuously")
         previous_end = block.end_s
+
+    if duration_s - blocks[-1].end_s > coverage_tolerance_s:
+        raise ValueError("declared blocks do not cover the audio end")
 
 
 def parse_audio_blocks(text: str, *, duration_s: float, max_blocks: int) -> list[AcousticBlock]:
