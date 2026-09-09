@@ -9,8 +9,8 @@ build/
 dist/
 artifacts/
 results/
-data/mvp/audio/
-data/mvp/pairs.jsonl
+data/mvp/
+data/mvp_*/
 *.pt
 *.pth
 *.ckpt
