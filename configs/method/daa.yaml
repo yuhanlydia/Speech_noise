@@ -1,0 +1,14 @@
+name: daa
+layers: []
+router_dim: 32
+lambda_switch: 0.0
+lambda_identity: 0.0
+checkpoint: null
+daa:
+  block_strategy: declared
+  block_seconds: 1.5
+  max_blocks: 8
+  max_focus_blocks: 2
+  scan_max_new_tokens: 192
+  select_max_new_tokens: 48
+  answer_max_new_tokens: 64
