@@ -18,9 +18,9 @@ method:
     block_strategy: fixed
     block_seconds: 1.5
     max_blocks: 8
-    max_focus_blocks: 2
+    max_focus_blocks: 8
     scan_max_new_tokens: 192
-    select_max_new_tokens: 48
+    select_max_new_tokens: 64
     answer_max_new_tokens: 64
 output_dir: results/mvp_daa_fixed
 seed: 0
