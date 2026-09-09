@@ -1,261 +1,264 @@
 # Speech_noise
 
-**Selective Acoustic Relevance for Speech / Audio Language Models**
+**Selective Acoustic Relevance and Declarative Acoustic Attention for Speech / Audio Language Models**
 
-This repository tests a narrow, falsifiable hypothesis:
+This repository studies a narrow question:
 
-> **Acoustic relevance is relational rather than intrinsic.** The same acoustic source/event can be nuisance for one query and necessary evidence for another.
+> **Does a Speech LM know which part of the exact same acoustic scene should matter for the current query?**
 
-The MVP therefore uses **same-waveform relevance-switch pairs**. A waveform is constructed once, hashed once, and paired with two questions:
+The controlled benchmark uses **same-waveform relevance-switch pairs**. One waveform is paired with two questions:
 
-- `q_ignore`: the event/source should not affect the answer;
-- `q_use`: the same event/source is required evidence.
+- `q_ignore`: a particular event/source should not influence the answer;
+- `q_use`: that exact same event/source is necessary evidence.
 
-Only the query changes. This prevents a model from solving the benchmark by treating a sound class, SNR, speaker, or waveform as globally “noise” or globally “evidence”.
-
-## Research question
-
-For an acoustic source/event `d` and query `q`, we test
+Only the query changes. The central hypothesis is therefore
 
 ```text
-R = R(d, q)
+R = R(acoustic event, query)
 ```
 
-rather than the common implicit simplification
+rather than treating a sound class as globally “noise” or globally “evidence”.
+
+## Current primary method: DAA
+
+The primary training-free experiment is **Declarative Acoustic Attention (DAA)**, inspired by the idea that an LM can explicitly declare which context region it needs.
+
+DAA uses three passes:
 
 ```text
-R = R(d).
+GLOBAL LISTEN
+    -> declare addressable acoustic blocks once per waveform
+FOCUS
+    -> for each query, declare the block(s) needed
+REASON
+    -> runtime exposes only selected audio KV to query/answer tokens
 ```
 
-The primary method is **QACR — Query-Conditioned Audio Contribution Routing**. QACR does not overwrite absolute K/V states. It gates the post-softmax contribution of audio key/value positions to Thinker self-attention:
+Example global declaration:
 
 ```text
-o_i' = sum_{j in text} a_ij V_j + sum_{j in audio} r_j(q) a_ij V_j
-
-r_j(q) = sigmoid((W_q e_q)^T (W_a h_j) / sqrt(d_r)).
+<audio_blocks>
+B1|0.00|1.40|target speaker
+B2|1.40|2.10|dog bark
+B3|2.10|3.50|traffic
+</audio_blocks>
 ```
 
-Non-audio contributions are unchanged. With `r=1`, the routed attention exactly reduces to base eager attention.
-
-## Why this repo exists
-
-Prior experiments on noise-induced KV drift showed a useful warning: a representation direction can be predictive of failure without being safe to suppress. QACR therefore changes the **contribution of acoustic evidence conditional on the query**, rather than projecting an absolute global KV subspace.
-
-The MVP is deliberately small. If the same-waveform relevance-switch phenomenon or the routing mechanism fails, the project stops rather than adding larger gates, RL, or extra modules.
-
-## Repository layout
+For “What animal is audible?” the model may emit:
 
 ```text
-configs/
-  data/                     data manifest config
-  experiment/               base / QACR experiment configs
-  method/                   QACR and matched routing controls
-  model/                    Qwen2.5-Omni-3B NF4 config
-examples/
-  source_manifest.example.jsonl
-scripts/
-  build_mvp_manifest.py     deterministic mixer + paired manifest builder
-  run_diagnostic.sh         base relevance-switch evaluation
-  train_qacr.sh             router-only supervised MVP training
-  eval_relevance_switch.sh  QACR evaluation
-src/sar/
-  data/                     schemas, mixing, benchmark adapter contracts
-  models/                   Qwen2.5-Omni wrapper + exact eager-attention hook
-  methods/                  QACR and matched routing baselines
-  config.py                 strict YAML schema
-  metrics.py                IgnoreAcc / UseAcc / SAR / PairSwitchAcc
-  train.py                  router objectives
-  gpu_smoke.py              dry-run, training, evaluation launcher
-tests/                      CPU-safe TDD suite
+<focus_audio blocks="B2">
 ```
 
-## Primary backbone
+For “What number did the speaker say?” on the **same waveform**, it should select the speech block instead.
 
-The default model is:
+The final pass does not merely prompt the model to focus. The Qwen Thinker attention hook maps selected time spans to audio placeholder tokens and masks unselected audio keys **before softmax**, so attention is renormalized over the declared acoustic context plus text/local tokens.
+
+### Important protocol property
+
+Block segmentation is generated **once per waveform pair** and reused for both `use` and `ignore` queries. Thus the experiment tests query-dependent focus, not query-dependent re-segmentation.
+
+### Two block conditions
+
+- `declared`: the Speech LM itself proposes semantic/time-local blocks;
+- `fixed`: deterministic temporal blocks isolate selection quality from segmentation quality.
+
+There is **no silent fallback**. An invalid declaration is recorded as a protocol failure and counts as an incorrect example.
+
+## QACR baseline
+
+The previous primary method, **QACR — Query-Conditioned Audio Contribution Routing**, remains implemented as a learned-routing baseline. QACR learns a soft token gate
+
+```text
+r_j(q) = sigmoid((W_q e_q)^T (W_a h_j) / sqrt(d_r))
+```
+
+and scales audio value contributions after softmax. DAA is deliberately different: it uses the model's explicit declaration and performs hard context exclusion before softmax.
+
+## Why both methods exist
+
+Earlier experiments showed that a representation direction can predict failure without being safe to suppress. The current research therefore compares two mechanisms:
+
+1. **hidden learned relevance** — QACR;
+2. **explicit self-declared relevance** — DAA.
+
+The same-waveform benchmark decides whether either mechanism actually improves relevance switching.
+
+## Backbone and hardware
+
+Primary backbone:
 
 ```text
 Qwen/Qwen2.5-Omni-3B
 ```
 
-The constrained setup is intended for a single 16 GB GPU such as an RTX A4000:
+Target setup for a single RTX A4000 16 GB:
 
-- Thinker-only text generation/scoring;
+- Thinker only;
 - Talker disabled;
-- 4-bit NF4 loading;
-- backbone frozen for QACR training;
-- only the tiny `W_q` / `W_a` router is optimized;
-- one-forward A/B/C/D next-token scoring for canonical single-token MCQ options;
-- eager attention is required for exact post-softmax audio-contribution routing.
+- 4-bit NF4;
+- text/canonical MCQ scoring;
+- eager attention for exact DAA/QACR hooks.
 
-QACR is slower than FlashAttention because exact contribution routing needs the eager attention probabilities. The point of the MVP is mechanism validation, not serving throughput.
+For DAA, `layers: []` means focus is enforced on **all Thinker self-attention layers**. A restricted layer list can be used for mechanistic ablations.
 
-## Installation
-
-CPU tests and manifest construction:
+## Install
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 pytest -q
+python -m compileall src scripts
 ```
 
-GPU experiments:
+GPU dependencies:
 
 ```bash
 pip install -e '.[dev,gpu]'
 ```
 
-The GPU extra installs `transformers`, `accelerate`, and `bitsandbytes`. The Qwen wrapper uses `Qwen2_5OmniThinkerForConditionalGeneration` and `Qwen2_5OmniProcessor` lazily, so importing the repository does not require those packages.
+## Data: same-waveform relevance-switch pairs
 
-## 1. Build controlled same-waveform pairs
+Prepare the controlled source manifest following:
 
-Prepare a JSONL source manifest following `examples/source_manifest.example.jsonl`. Each row points to a target waveform and one event/source stem. No benchmark audio is vendored into this repository.
-
-Important fields:
-
-```json
-{
-  "pair_id": "dog-0001",
-  "target_wav": "/data/targets/math_0001.wav",
-  "event_wav": "/data/events/dog_0001.wav",
-  "event_type": "dog_bark",
-  "offset_samples": 48000,
-  "snr_db": 5.0,
-  "source_mask_valid": true,
-  "q_ignore": "...",
-  "a_ignore": "C",
-  "options_ignore": ["A", "B", "C", "D"],
-  "q_use": "...",
-  "a_use": "B",
-  "options_use": ["A", "B", "C", "D"]
-}
+```text
+examples/source_manifest.example.jsonl
 ```
 
-Build the mixture and paired manifest:
+Then build mixed waveforms and paired records:
 
 ```bash
 python scripts/build_mvp_manifest.py /path/to/source.jsonl data/mvp
 ```
 
-The builder writes one mixed waveform per pair and two records referencing the **same absolute path and SHA-256 waveform hash**. Pair validation rejects hash mismatches.
+Each `use` / `ignore` pair must share the exact same waveform path and SHA-256 hash.
 
-### `source_mask_valid`
+For the first DAA experiment, prefer **time-separable events** so a temporal block can isolate the event. Overlapping speakers are not treated as source-separated merely because they share a time span.
 
-`source_mask_valid=true` means the source/event can be approximated by a temporal interval, so the builder's start/end time can be mapped to an audio-token span for auxiliary routing supervision.
-
-This is **not source separation**. Do not set it to true for overlapping competing speech when the same time interval also contains target speech. Overlapping-speaker experiments should initially use QA supervision only, or a real source mask from a benchmark/separation system.
-
-## 2. Validate experiment wiring without loading a model
-
-```bash
-python -m sar.gpu_smoke \
-  --config configs/experiment/mvp_diagnostic.yaml \
-  --dry-run
-```
-
-This checks config strictness, paired records, hashes, counts, and output paths without importing GPU-only model dependencies.
-
-## 3. Gate A — base same-waveform diagnostic
+## Gate A: base relevance-switch diagnostic
 
 ```bash
 bash scripts/run_diagnostic.sh
 ```
 
-This evaluates the base Thinker on both queries for every waveform pair and writes:
+Primary task metrics:
 
-```text
-results/mvp_diagnostic/results.jsonl
-results/mvp_diagnostic/summary.json
+- `IgnoreAcc`
+- `UseAcc`
+- `SAR` — harmonic mean of the two
+- `PairSwitchAcc` — both queries correct for the same waveform
+
+If the base model already has high PairSwitchAcc close to both one-sided accuracies, the research direction should stop.
+
+## DAA dry-run
+
+```bash
+python -m sar.daa_smoke \
+  --config configs/experiment/mvp_daa_declared.yaml \
+  --dry-run
 ```
 
-The core metrics are:
+## DAA with model-declared event blocks
 
-- **IgnoreAcc** — accuracy when the event/source should not matter;
-- **UseAcc** — accuracy when that same event/source is evidence;
-- **SAR** — harmonic mean of IgnoreAcc and UseAcc;
-- **PairSwitchAcc** — fraction of waveforms where *both* paired queries are correct.
+```bash
+bash scripts/run_daa.sh configs/experiment/mvp_daa_declared.yaml
+```
 
-A model that always ignores background audio can score high on IgnoreAcc but low on UseAcc. A model that indiscriminately uses every sound can show the opposite pattern. SAR and PairSwitchAcc require both behaviors.
+## DAA fixed-block control
 
-## 4. Train QACR
+```bash
+bash scripts/run_daa.sh configs/experiment/mvp_daa_fixed.yaml
+```
+
+The fixed-block condition answers a critical diagnostic question:
+
+> If model-declared DAA fails, is the failure caused by bad acoustic segmentation or by bad query-dependent selection?
+
+## DAA outputs
+
+The evaluator writes standard result rows plus:
+
+- selected block ids;
+- raw block declaration;
+- raw focus declaration;
+- whether the labeled event was selected;
+- protocol failure stage.
+
+Summary metrics include:
+
+- protocol completion rate;
+- use-event selection rate;
+- ignore-event avoidance rate;
+- selection switch accuracy;
+- reasoning accuracy given correct use selection;
+- reasoning accuracy given correct ignore avoidance;
+- IgnoreAcc / UseAcc / SAR / PairSwitchAcc.
+
+This allows two failures to be separated:
+
+```text
+selection failure: model chose the wrong acoustic evidence
+reasoning failure: model chose the right evidence but still answered incorrectly
+```
+
+## QACR experiments
+
+Existing QACR scripts are preserved:
 
 ```bash
 bash scripts/train_qacr.sh
-```
-
-The default config freezes the entire Qwen Thinker and optimizes only QACR at layer 0. For canonical A/B/C/D options, training uses a single forward pass and CE on next-token option logits.
-
-When `source_mask_valid=true`, the auxiliary switch objective encourages the event token span toward:
-
-```text
-q_use    -> gate ~= 1
-q_ignore -> gate ~= 0
-```
-
-while an identity penalty protects other audio tokens toward gate 1. If no valid temporal source mask exists, the auxiliary switch/identity terms are skipped for that record and QA loss remains active.
-
-Checkpoint:
-
-```text
-artifacts/qacr/router.pt
-```
-
-The checkpoint contains only the small router state and metadata, not Qwen weights.
-
-## 5. Evaluate QACR
-
-```bash
 bash scripts/eval_relevance_switch.sh
 ```
 
-In addition to task metrics, QACR evaluation reports event-gate means and the use-minus-ignore event gate gap when valid temporal event masks are available.
+QACR is not removed or rewritten by the DAA branch.
 
-## Matched baselines
+## External benchmark adapters
 
-The repository includes common routing controls under `src/sar/methods/`:
+Evaluation adapter contracts remain available for:
 
-- `StaticAudioGate` — query-independent audio strength;
-- `LayerRouter` — query-conditioned layer weights;
-- `HeadRouter` — query-conditioned head weights;
-- `FixedKVSubspace` — prior fixed-subspace mechanistic control;
-- `OracleMaskRouter` — upper bound when a source relevance mask is available;
-- `QACRRouter` — token/source-level query-conditioned contribution routing.
+- RSA-Bench — irrelevant acoustic context / robustness;
+- MMSU — acoustic evidence retention;
+- SH-Bench — speaker/policy-selective evidence use;
+- VoxSafeBench — context-dependent safety evidence.
 
-The controlled tensor implementations and parameter-count interfaces are tested now. The first GPU launcher intentionally wires only Base and QACR; layer/head GPU baselines are activated after Gate A/B justify scaling, per the preregistered stopping logic in the design spec.
+The controlled same-waveform experiment must pass before scaling to these benchmarks.
 
-## External benchmark roles
+## Go / No-Go
 
-Evaluation-only adapter contracts are provided for:
+### Gate A — phenomenon
 
-- **RSA-Bench** — primarily the “ignore irrelevant acoustic context” side;
-- **MMSU** — acoustic evidence retention / “use” tasks;
-- **SH-Bench** — speaker/policy-selective use;
-- **VoxSafeBench** — context-dependent acoustic safety evidence.
+Base model must show a meaningful same-waveform relevance-switch weakness.
 
-Adapters require locally prepared/exported `pairs.jsonl` manifests. They never auto-download benchmark audio. The controlled same-waveform diagnostic is run before external scaling.
+### Gate B — declarative selection
 
-## Go / No-Go criteria
+DAA must achieve useful protocol coverage and the selected event must reverse appropriately between `q_use` and `q_ignore`. Compare declared vs fixed blocks.
 
-The approved design is in `docs/superpowers/specs/2026-09-02-selective-acoustic-relevance-design.md`.
+### Gate C — functional focused reasoning
 
-- **Gate A — phenomenon:** base must show a meaningful relevance-switch weakness; one-sided success should not trivially imply high PairSwitchAcc.
-- **Gate B — mechanism:** QACR gates must change with query relevance on the exact same waveform and outperform query-independent controls at relevance separation.
-- **Gate C — functional benefit:** QACR must improve SAR/PairSwitchAcc without materially degrading clean behavior; development target is <= 1 percentage point clean drop.
+DAA must improve SAR / PairSwitchAcc, or at minimum demonstrate that correct block selection isolates the remaining problem to downstream reasoning.
 
-If A fails, stop. If B fails, do not scale. If C fails, do not add complexity merely to rescue the validation result.
+If Gate B fails, do not add DAA training simply to rescue the result. If Gate C fails despite correct focus, investigate the reasoning interface rather than adding larger routers.
 
-## Testing
+## Code layout
 
-All core mechanics are CPU-testable:
-
-```bash
-pytest -q
-python -m compileall src scripts
+```text
+src/sar/data/blocks.py          acoustic block parsing and time->token mapping
+src/sar/methods/daa.py          scan/focus protocol and pure attention semantics
+src/sar/models/daa_hook.py      Qwen pre-softmax focused-attention hook
+src/sar/models/qwen_omni_daa.py Qwen global/focus/reason wrapper
+src/sar/daa_pipeline.py         same-waveform DAA pipeline + mechanism metrics
+src/sar/daa_smoke.py            A4000 evaluator / dry-run
+src/sar/methods/qacr.py         previous learned routing baseline
 ```
 
-Tests cover same-waveform hash invariants, deterministic mixing, hand-computed metrics, canonical option scoring helpers, exact QACR identity at gate=1, text-contribution isolation, query-dependent gate switching, cached-key gate padding, baseline interfaces, local benchmark adapters, config strictness, training objectives, and dry-run experiment validation.
+Design and implementation notes:
 
-## Current verification boundary
+```text
+docs/superpowers/specs/2026-09-09-declarative-acoustic-attention-design.md
+docs/superpowers/plans/2026-09-09-daa-mvp.md
+```
 
-The repository code is designed so CPU verification does **not** require downloading Qwen weights. A real Qwen GPU run must still be executed in the target CUDA environment before reporting any empirical QACR result. The code should not be cited as having passed Gate A/B/C until those GPU experiments have actually run.
+## Verification boundary
+
+The DAA core protocol, block mapping, attention semantics, controller/cache behavior, pair pipeline, strict config, and evaluator have CPU tests. A real Qwen2.5-Omni CUDA run is still required before claiming any empirical DAA improvement or Gate A/B/C result.
