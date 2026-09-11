@@ -1,108 +1,83 @@
 # Speech_noise
 
-**Selective Acoustic Relevance and Declarative Acoustic Attention for Speech / Audio Language Models**
+## Selective Acoustic Relevance / Validity-Gated Declarative Acoustic Attention
 
-This repository studies a narrow question:
+This repository asks one falsifiable question:
 
-> **Does a Speech LM know which part of the exact same acoustic scene should matter for the current query?**
+> **For the exact same acoustic scene, can a Speech LM change which acoustic evidence is functionally used when only the query changes?**
 
-The controlled benchmark uses **same-waveform relevance-switch pairs**. One waveform is paired with two questions:
-
-- `q_ignore`: a particular event/source should not influence the answer;
-- `q_use`: that exact same event/source is necessary evidence.
-
-Only the query changes. The central hypothesis is therefore
+The hypothesis is relational relevance:
 
 ```text
-R = R(acoustic event, query)
+R = R(acoustic evidence, query)
 ```
 
-rather than treating a sound class as globally “noise” or globally “evidence”.
+rather than treating a sound as globally “noise” or globally “evidence”.
 
-## Current primary method: DAA
+## Important: the original MVP is superseded
 
-The primary training-free experiment is **Declarative Acoustic Attention (DAA)**, inspired by the idea that an LM can explicitly declare which context region it needs.
+The first MVP mixed three effects:
 
-DAA uses three passes:
+1. whether the model could solve the spoken MMLU item at all;
+2. whether it could recognize the ESC-50 event at all;
+3. whether it could switch acoustic relevance in the mixed waveform.
+
+It also used query wording that explicitly said `ignore` / `irrelevant`, which leaked the intended relevance relation.
+
+**Do not use the old run to accept or reject the research hypothesis.**
+
+The current protocol is **Validity-Gated DAA V2**. It first proves that both component capabilities exist, then tests the mixed waveform, then asks whether perfect ground-truth KV focusing can causally rescue the failure.
+
+Full protocol:
 
 ```text
-GLOBAL LISTEN
-    -> declare addressable acoustic blocks once per waveform
-FOCUS
-    -> for each query, declare the block(s) needed
-REASON
-    -> runtime exposes only selected audio KV to query/answer tokens
+docs/VALIDITY_GATED_DAA_V2.md
 ```
 
-Example global declaration:
+---
+
+# 1. Method
+
+## DAA — Declarative Acoustic Attention
+
+The Speech LM is given an addressable acoustic context and explicitly declares which block IDs it needs for the current query:
 
 ```text
-<audio_blocks>
-B1|0.00|1.40|target speaker
-B2|1.40|2.10|dog bark
-B3|2.10|3.50|traffic
-</audio_blocks>
+<focus_audio blocks="B2,B3">
 ```
 
-For “What animal is audible?” the model may emit:
+The runtime then masks unselected audio keys **before attention softmax** for the query/answer consumer tokens. Therefore the attention distribution is renormalized over the selected audio KV plus normal text/local context.
 
-```text
-<focus_audio blocks="B2">
-```
+The primary V2 condition uses **fixed temporal blocks**. This is deliberate: model-generated timestamp segmentation is a separate capability and must not be conflated with relevance selection.
 
-For “What number did the speaker say?” on the **same waveform**, it should select the speech block instead.
-
-The final pass does not merely prompt the model to focus. The Qwen Thinker attention hook maps selected time spans to audio placeholder tokens and masks unselected audio keys **before softmax**, so attention is renormalized over the declared acoustic context plus text/local tokens.
-
-### Important protocol property
-
-Block segmentation is generated **once per waveform pair** and reused for both `use` and `ignore` queries. Thus the experiment tests query-dependent focus, not query-dependent re-segmentation.
-
-### Two block conditions
-
-- `declared`: the Speech LM itself proposes semantic/time-local blocks;
-- `fixed`: deterministic temporal blocks isolate selection quality from segmentation quality.
-
-There is **no silent fallback**. An invalid declaration is recorded as a protocol failure and counts as an incorrect example. Declared blocks must also cover the full waveform rather than silently omitting inconvenient audio.
+Model-declared semantic segmentation remains a secondary ablation.
 
 ## QACR baseline
 
-The previous primary method, **QACR — Query-Conditioned Audio Contribution Routing**, remains implemented as a learned-routing baseline. QACR learns a soft token gate
+The previous learned soft router remains in the repository:
 
 ```text
 r_j(q) = sigmoid((W_q e_q)^T (W_a h_j) / sqrt(d_r))
 ```
 
-and scales audio value contributions after softmax. DAA is deliberately different: it uses the model's explicit declaration and performs hard context exclusion before softmax.
+QACR is not the primary V2 method because query-conditioned audio routing by itself is no longer a sufficiently distinctive contribution.
 
-## Why both methods exist
+---
 
-Earlier experiments showed that a representation direction can predict failure without being safe to suppress. The current research therefore compares two mechanisms:
+# 2. Backbone and hardware
 
-1. **hidden learned relevance** — QACR;
-2. **explicit self-declared relevance** — DAA.
-
-The same-waveform benchmark decides whether either mechanism actually improves relevance switching.
-
-## Backbone and hardware
-
-Primary backbone:
+Default:
 
 ```text
 Qwen/Qwen2.5-Omni-3B
+Thinker only
+4-bit NF4
+eager attention
 ```
 
-Target setup for a single RTX A4000 16 GB or RTX 3090 24 GB:
+The code is designed for a 16 GB A4000 and also runs on a 24 GB RTX 3090.
 
-- Thinker only;
-- Talker disabled;
-- 4-bit NF4;
-- text/canonical MCQ scoring;
-- eager attention for exact DAA/QACR hooks.
-
-For DAA, `layers: []` means focus is enforced on **all Thinker self-attention layers**. A restricted layer list can be used for mechanistic ablations.
-
-## Install
+Install:
 
 ```bash
 python -m venv .venv
@@ -113,49 +88,58 @@ pytest -q
 python -m compileall src scripts
 ```
 
-The `data` extra installs Hugging Face `datasets` / `huggingface_hub`. `espeak-ng` is used only to synthesize the controlled MMLU target speech; no cloud TTS key is required.
+---
 
-# Public one-command data preparation
+# 3. Public V2 data
 
-You do **not** need to provide private WAV files for the first experiment.
+Primary development dataset:
 
-The default public MVP uses:
+- reasoning content: `cais/mmlu`, `validation`;
+- target speech: local eSpeak-NG synthesis of the MMLU question and four choices;
+- acoustic event: `ashraq/esc50`, folds 1/2/3, restricted to distinctive classes;
+- confirmation data: MMLU `test` + ESC-50 folds 4/5;
+- optional second-stage stress: LibriSpeech `validation.clean` / `test.clean`.
 
-1. **Target reasoning content:** `cais/mmlu`, config `all`.
-2. **Target speech:** the MMLU question + four choices synthesized locally with eSpeak-NG.
-3. **Acoustic event:** `ashraq/esc50`, restricted to acoustically distinctive classes such as dog, siren, rain, footsteps, alarm, car horn, train, airplane, etc.
-4. **Same-waveform pair:** the spoken MMLU question is followed by the event. The exact same resulting waveform is used for both queries.
-
-The two queries are:
-
-```text
-q_ignore: answer the spoken MMLU question; the later event is irrelevant
-q_use:    identify the later acoustic event; ignore the MMLU question
-```
-
-Thus the same event must switch from **nuisance** to **evidence** solely because the query changed.
-
-## Development protocol
-
-Development sources are deliberately separated from confirmation sources:
+The first mechanism test is time-separated:
 
 ```text
-DEV
-  MMLU:       validation
-  ESC-50:     folds 1,2,3
-  LibriSpeech validation.clean
-
-CONFIRM
-  MMLU:       test
-  ESC-50:     folds 4,5
-  LibriSpeech test.clean
+spoken MMLU -> short gap -> ESC-50 event
 ```
 
-Do not run `--protocol confirm` until the DAA settings and analysis protocol are frozen.
+This is **not yet a cocktail-party/noise benchmark**. It first tests whether query-relative acoustic evidence selection exists at all.
 
-## Build the default environmental-event MVP
+### V2 query policy
+
+The query itself defines relevance. We do not tell the model what to ignore.
+
+Target query:
+
+```text
+Which option correctly answers the spoken multiple-choice question?
+Answer with A, B, C, or D only.
+```
+
+Event query:
+
+```text
+Which of the following sounds can be heard in the recording?
+A. ... B. ... C. ... D. ...
+Answer with A, B, C, or D only.
+```
+
+No `ignore`, `irrelevant`, or relevance-label leakage is used.
+
+---
+
+# 4. Run V2 — in this order
+
+## Step 0 — regenerate fresh data
+
+**Delete the old MVP. Old pairs contain obsolete prompts.**
 
 ```bash
+rm -rf data/mvp results/mvp_* results/data_audit reports/run_v2
+
 python scripts/prepare_public_mvp.py \
   --output-dir data/mvp \
   --num-pairs 128 \
@@ -164,178 +148,257 @@ python scripts/prepare_public_mvp.py \
   --seed 0
 ```
 
-This command downloads the public source datasets, synthesizes/normalizes the WAV files, writes:
+This creates:
 
 ```text
 data/mvp/source.jsonl
-data/mvp/public_mvp_metadata.json
 data/mvp/pairs.jsonl
-data/mvp/sources/...
-data/mvp/audio/...
+data/mvp/sources/target/*.wav
+data/mvp/sources/esc50/*.wav
+data/mvp/audio/*.wav
 ```
 
-and therefore removes the previous `data/mvp/pairs.jsonl` blocker.
-
-The generated event is time-separable from the target speech in this first mechanism test. This is intentional: DAA must first demonstrate that it can select an addressable block before we move to overlapping-source stress tests.
-
-## Real-human competing-speech stress
-
-The same preparation script also supports public LibriSpeech:
+## Step 1 — data audit
 
 ```bash
-python scripts/prepare_public_mvp.py \
-  --output-dir data/mvp_librispeech \
-  --num-pairs 128 \
-  --protocol dev \
-  --event-source librispeech \
-  --seed 0
+python scripts/audit_mvp_data.py \
+  --source-manifest data/mvp/source.jsonl \
+  --pairs-manifest data/mvp/pairs.jsonl
 ```
 
-Here the later event is a **real human LibriSpeech utterance** and `q_use` asks which phrase the background speaker said. LibriSpeech is the second-stage stress condition; run ESC-50 first.
-
-The TARS synthesized spoken-MMLU corpus can be used later as an additional replication, but it is not a default dependency because the public-data access path is heavier and can require Hugging Face account acceptance. The default MVP is intentionally runnable from `cais/mmlu + ESC-50` without that blocker.
-
-## Manual data path (optional)
-
-If you already have your own target/event WAVs, the original manual builder remains supported. Prepare a source manifest following:
+Required:
 
 ```text
-examples/source_manifest.example.jsonl
+ok = true
+num_errors = 0
 ```
 
-then run:
+The audit rereads the actual WAVs and checks sample rates, offsets, event spans, finite samples, use/ignore waveform identity, and recomputed SHA-256 hashes.
+
+If this fails, fix data before using a GPU result.
+
+## Step 2 — isolated capability gate
 
 ```bash
-python scripts/build_mvp_manifest.py /path/to/source.jsonl data/mvp
+bash scripts/run_capability_gate.sh
 ```
 
-Each `use` / `ignore` pair must share the exact same waveform path and SHA-256 hash.
+Each pair is tested on:
 
-For the first DAA experiment, prefer **time-separable events** so a temporal block can isolate the event. Overlapping speakers are not treated as source-separated merely because they share a time span.
+```text
+target WAV only + target/MMLU query
+event WAV only  + event query
+```
 
-# Experiment sequence
+A pair is retained only when both answers are correct:
 
-## Gate A: base relevance-switch diagnostic
+```text
+eligible = target_only_correct AND event_only_correct
+```
+
+Outputs:
+
+```text
+results/mvp_capability_gate/summary.json
+data/mvp/pairs_eligible.jsonl
+```
+
+Decision:
+
+- `<32 / 128` eligible: invalid setup; do not interpret a relevance gap;
+- `32–63`: exploratory only;
+- `>=64`: proceed.
+
+All later configs read `pairs_eligible.jsonl`.
+
+## Step 3 — mixed Base
 
 ```bash
 bash scripts/run_diagnostic.sh
 ```
 
-Primary task metrics:
+Metrics:
 
 - `IgnoreAcc`
 - `UseAcc`
-- `SAR` — harmonic mean of the two
-- `PairSwitchAcc` — both queries correct for the same waveform
+- `SAR`
+- `PairSwitchAcc`
 
-If the base model already has high PairSwitchAcc close to both one-sided accuracies, the research direction should stop.
+Stop the whole project when the eligible mixed Base is already strong:
 
-## DAA dry-run
-
-```bash
-python -m sar.daa_smoke \
-  --config configs/experiment/mvp_daa_declared.yaml \
-  --dry-run
+```text
+PairSwitchAcc >= 0.80
+AND
+PairSwitchAcc >= min(IgnoreAcc, UseAcc) - 0.05
 ```
 
-## DAA fixed-block control first
+Then there is no large relevance-switch failure worth solving.
+
+## Step 4 — Oracle-KV rescue: decisive mechanism gate
+
+```bash
+bash scripts/run_daa.sh configs/experiment/mvp_daa_oracle.yaml
+```
+
+Oracle uses the known generated temporal regions:
+
+```text
+ignore query -> pre-event target region
+use query    -> exact event region
+```
+
+Define:
+
+```text
+oracle_gain = Oracle PairSwitchAcc - Base PairSwitchAcc
+failure_rescue_fraction = oracle_gain / (1 - Base PairSwitchAcc)
+```
+
+**Stop the DAA/KV-routing line** if:
+
+```text
+oracle_gain < 0.05
+OR
+failure_rescue_fraction < 0.15
+```
+
+If perfect focus cannot help, selector training or better segmentation is not the answer.
+
+## Step 5 — Prompt-only control
+
+Only run if Oracle passes:
+
+```bash
+bash scripts/run_daa.sh configs/experiment/mvp_daa_prompt_only.yaml
+```
+
+The model emits/receives the same focus declaration but the runtime does **not** mask KV.
+
+This isolates gains caused by explicit focus prompting from gains caused by the actual attention intervention.
+
+## Step 6 — self-declared fixed-block DAA
 
 ```bash
 bash scripts/run_daa.sh configs/experiment/mvp_daa_fixed.yaml
 ```
 
-Run fixed blocks before model-declared blocks. This isolates query-dependent selection from acoustic segmentation quality.
+Correct selection requires:
 
-## DAA with model-declared event blocks
+```text
+use: event midpoint is inside a selected block
+ignore: event is avoided AND >=80% of the pre-event target region is retained
+```
+
+The KV intervention is not compelling if:
+
+```text
+Fixed-DAA PairSwitchAcc - Prompt-only PairSwitchAcc < 0.03
+```
+
+If Oracle works but zero-shot `SelectionSwitchAcc < 0.50`, one Qwen2.5-Omni-7B NF4 replication is reasonable. If 7B also fails, stop the zero-shot declarative selector.
+
+## Step 7 — declared segmentation ablation
+
+Only after fixed DAA:
 
 ```bash
 bash scripts/run_daa.sh configs/experiment/mvp_daa_declared.yaml
 ```
 
-The declared condition answers the harder question: can the Speech LM itself construct a useful acoustic address space before selecting query-relevant evidence?
+Failure here means semantic/timestamp declaration is unreliable. It does not by itself refute fixed-address DAA.
 
-## DAA outputs
+---
 
-The evaluator writes standard result rows plus:
+# 5. Causal comparison table
 
-- selected block ids;
-- raw block declaration;
-- raw focus declaration;
-- whether the labeled event midpoint was selected;
-- protocol failure stage.
+The V2 paper claim must be supported by all of these conditions:
 
-Summary metrics include:
+| Condition | Focus source | KV mask | Purpose |
+|---|---|---:|---|
+| Base | none | no | mixed relevance-switch gap |
+| Oracle-KV | ground truth | yes | causal upper bound / line-kill test |
+| Prompt-only | model | no | explicit-reasoning control |
+| Fixed DAA | model | yes | primary zero-shot method |
+| Declared DAA | model + model segmentation | yes | harder segmentation ablation |
 
-- protocol completion rate;
-- use-event selection rate;
-- ignore-event avoidance rate;
-- selection switch accuracy;
-- reasoning accuracy given correct use selection;
-- reasoning accuracy given correct ignore avoidance;
-- IgnoreAcc / UseAcc / SAR / PairSwitchAcc.
-
-This allows two failures to be separated:
+The critical comparisons are:
 
 ```text
-selection failure: model chose the wrong acoustic evidence
-reasoning failure: model chose the right evidence but still answered incorrectly
+Base -> Oracle-KV
+Prompt-only -> Fixed DAA
 ```
 
-## QACR experiments
+---
 
-Existing QACR scripts are preserved:
+# 6. Make results visible on GitHub
+
+`results/` and generated audio are intentionally ignored. After the experiment:
 
 ```bash
-bash scripts/train_qacr.sh
-bash scripts/eval_relevance_switch.sh
+python scripts/export_run_v2.py
+
+git add reports/run_v2
+git commit -m "results: add validity-gated DAA V2 run"
+git push
 ```
 
-QACR is not removed or rewritten by the DAA branch.
-
-## External benchmark adapters
-
-Evaluation adapter contracts remain available for:
-
-- RSA-Bench — irrelevant acoustic context / robustness;
-- MMSU — acoustic evidence retention;
-- SH-Bench — speaker/policy-selective evidence use;
-- VoxSafeBench — context-dependent safety evidence.
-
-The controlled same-waveform experiment must pass before scaling to these benchmarks.
-
-## Go / No-Go
-
-### Gate A — phenomenon
-
-Base model must show a meaningful same-waveform relevance-switch weakness.
-
-### Gate B — declarative selection
-
-DAA must achieve useful protocol coverage and the selected event must reverse appropriately between `q_use` and `q_ignore`. Compare declared vs fixed blocks.
-
-### Gate C — functional focused reasoning
-
-DAA must improve SAR / PairSwitchAcc, or at minimum demonstrate that correct block selection isolates the remaining problem to downstream reasoning.
-
-If Gate B fails, do not add DAA training simply to rescue the result. If Gate C fails despite correct focus, investigate the reasoning interface rather than adding larger routers.
-
-## Code layout
+Then the actual metrics are available under:
 
 ```text
-src/sar/data/public_mvp.py     public MMLU/ESC-50/LibriSpeech preparation
-scripts/prepare_public_mvp.py  one-command source + pairs builder
-src/sar/data/blocks.py         acoustic block parsing and time->token mapping
-src/sar/methods/daa.py         scan/focus protocol and pure attention semantics
-src/sar/models/daa_hook.py     Qwen pre-softmax focused-attention hook
-src/sar/models/qwen_omni_daa.py Qwen global/focus/reason wrapper
-src/sar/daa_pipeline.py        same-waveform DAA pipeline + mechanism metrics
-src/sar/daa_smoke.py           A4000/3090 evaluator / dry-run
-src/sar/methods/qacr.py        previous learned routing baseline
+reports/run_v2/summary.json
+reports/run_v2/SUMMARY.md
 ```
 
-Design and implementation notes:
+---
+
+# 7. Research stopping rule
+
+We do **not** keep adding modules until something works.
 
 ```text
-docs/superpowers/specs/2026-09-09-declarative-acoustic-attention-design.md
-docs/superpowers/plans/2026-09-09-daa-mvp.md
+Data invalid
+  -> fix data
+
+Insufficient isolated capability
+  -> invalid benchmark/backbone pairing
+
+No mixed gap among eligible pairs
+  -> STOP PROJECT
+
+Gap exists but Oracle-KV cannot rescue
+  -> STOP DAA / KV-routing line
+
+Oracle rescues but Fixed DAA ~= Prompt-only
+  -> explicit prompt effect, weak KV-method claim
+
+Oracle rescues and Fixed DAA > Prompt-only with correct relevance reversal
+  -> CONTINUE; strong mechanism candidate
 ```
+
+Only after this sequence passes should the project move to partial overlap, competing human speech, multiple backbones, and external speech/audio benchmarks.
+
+---
+
+# Code map
+
+```text
+src/sar/data/public_mvp.py      public data construction
+src/sar/data/audit.py           waveform / metadata integrity audit
+src/sar/validity.py             isolated capability eligibility gate
+src/sar/validity_smoke.py       capability GPU launcher
+src/sar/data/blocks.py          acoustic block address space
+src/sar/methods/daa.py          focus protocol and attention semantics
+src/sar/models/daa_hook.py      pre-softmax Qwen audio-KV masking
+src/sar/models/qwen_omni_daa.py Base / prompt-only / masked DAA wrapper
+src/sar/daa_pipeline.py         oracle/model focus + selection metrics
+src/sar/daa_smoke.py            DAA evaluator
+src/sar/report.py               tracked V2 report export
+scripts/prepare_public_mvp.py
+scripts/audit_mvp_data.py
+scripts/run_capability_gate.sh
+scripts/run_diagnostic.sh
+scripts/run_daa.sh
+scripts/export_run_v2.py
+```
+
+QACR remains under `src/sar/methods/qacr.py` as a learned-routing baseline, but it is not part of the decisive V2 gate sequence.
