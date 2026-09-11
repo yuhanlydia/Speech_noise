@@ -1,0 +1,8 @@
+{
+  "target_only_correct": 63,
+  "event_only_correct": 127,
+  "eligible_pairs": 63,
+  "base_ignore_correct": 58,
+  "base_use_correct": 61,
+  "base_both_correct": 56
+}

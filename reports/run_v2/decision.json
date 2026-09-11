@@ -1,0 +1,24 @@
+{
+  "status": "STOP_AT_BASE_GATE",
+  "evidence_tier": "exploratory_only",
+  "eligible_pairs": 63,
+  "formal_minimum_eligible_pairs": 64,
+  "base_pair_switch_acc": 0.8888888888888888,
+  "base_absolute_threshold": 0.8,
+  "base_relative_threshold": 0.8706349206349205,
+  "stop_absolute_condition": true,
+  "stop_relative_condition": true,
+  "oracle_total_gain": null,
+  "oracle_kv_gain": null,
+  "failure_rescue_fraction": null,
+  "self_kv_gain": null,
+  "not_run": {
+    "Oracle-Prompt-only": "TASK_V2.md step 5 Base stop condition met; no downstream experiments permitted by this run protocol.",
+    "Oracle-KV": "TASK_V2.md step 5 Base stop condition met; no downstream experiments permitted by this run protocol.",
+    "Self Prompt-only": "TASK_V2.md step 5 Base stop condition met; no downstream experiments permitted by this run protocol.",
+    "Self Fixed-DAA": "TASK_V2.md step 5 Base stop condition met; no downstream experiments permitted by this run protocol.",
+    "Model-declared segmentation": "TASK_V2.md step 5 Base stop condition met; no downstream experiments permitted by this run protocol.",
+    "7B NF4 replication": "TASK_V2.md step 5 Base stop condition met; no downstream experiments permitted by this run protocol."
+  },
+  "interpretation": "Stop this V2 run under the preregistered Base rule. With 63 eligible pairs, findings are exploratory and do not establish that relevance-switch failures never exist. No Oracle efficacy or KV causal effect was measured."
+}
