@@ -113,13 +113,17 @@ def install_daa_on_qwen_attention(attn_module: nn.Module, controller: DAAControl
         raise ValueError("DAA requires attn_implementation='eager' for exact block masking")
 
     try:
-        from transformers.models.qwen2_5_omni.modeling_qwen2_5_omni import (
-            apply_multimodal_rotary_pos_emb,
-        )
+        from transformers.models.qwen2_5_omni import modeling_qwen2_5_omni as qwen
     except ImportError as exc:  # pragma: no cover
         raise RuntimeError(
             "Install sar[gpu] with Qwen2.5-Omni Transformers support"
         ) from exc
+
+    # Recent Transformers composes the multimodal frequencies in the rotary
+    # embedding module, so attention receives ordinary [batch, seq, dim] cos/sin.
+    # Select the upstream API explicitly; never retry a failed rotary operation.
+    multimodal_rotary = getattr(qwen, "apply_multimodal_rotary_pos_emb", None)
+    rotary = multimodal_rotary or qwen.apply_rotary_pos_emb
 
     original_forward = attn_module.forward
 
@@ -145,12 +149,12 @@ def install_daa_on_qwen_attention(attn_module: nn.Module, controller: DAAControl
         if position_embeddings is None:
             raise ValueError("DAA Qwen attention requires position_embeddings")
         cos, sin = position_embeddings
-        query_states, key_states = apply_multimodal_rotary_pos_emb(
-            query_states,
-            key_states,
-            cos,
-            sin,
-            module_self.config.rope_parameters["mrope_section"],
+        rotary_args = (
+            (module_self.config.rope_parameters["mrope_section"],)
+            if multimodal_rotary is not None else ()
+        )
+        query_states, key_states = rotary(
+            query_states, key_states, cos, sin, *rotary_args
         )
         if past_key_values is not None:
             key_states, value_states = past_key_values.update(

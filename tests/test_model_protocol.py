@@ -21,7 +21,10 @@ def test_routing_context_requires_boolean_audio_mask():
         )
 
 
-def test_qwen_wrapper_fails_actionably_without_gpu_extra():
+def test_qwen_wrapper_fails_actionably_without_gpu_extra(monkeypatch):
+    import sys
+
+    monkeypatch.setitem(sys.modules, "transformers", None)
     wrapper = QwenOmniWrapper(QwenOmniConfig())
     with pytest.raises(RuntimeError, match=r"Install sar\[gpu\]"):
         wrapper.load()
