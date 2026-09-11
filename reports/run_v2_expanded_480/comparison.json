@@ -1,0 +1,33 @@
+{
+  "original_128_run_base": {
+    "ignore_acc": 0.9206349206349206,
+    "use_acc": 0.9682539682539683,
+    "sar": 0.943844204348406,
+    "pair_switch_acc": 0.8888888888888888,
+    "num_pairs": 63.0
+  },
+  "expanded_480_run_base": {
+    "ignore_acc": 0.9201680672268907,
+    "use_acc": 0.9747899159663865,
+    "sar": 0.9466917587434086,
+    "pair_switch_acc": 0.8949579831932774,
+    "num_pairs": 238.0
+  },
+  "new_352_pairs_eligible_base": {
+    "ignore_acc": 0.92,
+    "use_acc": 0.9771428571428571,
+    "sar": 0.9477108433734939,
+    "pair_switch_acc": 0.8971428571428571,
+    "num_pairs": 175.0
+  },
+  "original_128_capability_reproduced": {
+    "repeated_pairs": 128,
+    "pairs_with_changed_predictions_or_eligibility": 0,
+    "changed_pair_ids": [],
+    "new_eligible_pairs": 175
+  },
+  "repeated_base_rows": 126,
+  "repeated_base_predictions_changed": 0,
+  "repeated_base_max_logprob_difference": 0.0,
+  "interpretation": "Expanded dev stability check, not independent held-out confirmation. New-subset metrics are descriptive; gates used all 238 eligible pairs."
+}

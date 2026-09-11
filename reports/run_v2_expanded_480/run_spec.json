@@ -1,0 +1,13 @@
+{
+  "source_head": "55a2c74cee225486d120ee4cf42e4454c6447d6c",
+  "num_pairs": 480,
+  "protocol": "dev",
+  "event_source": "esc50",
+  "seed": 0,
+  "model": "Qwen/Qwen2.5-Omni-3B",
+  "quantization": "nf4",
+  "purpose": "post-hoc expanded-development stability check",
+  "prior_run": "reports/run_v2",
+  "independent_confirmation": false,
+  "stopping_rules": "Unchanged TASK_V2.md rules; scale only pair count and isolate paths."
+}

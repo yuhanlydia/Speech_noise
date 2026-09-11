@@ -1,0 +1,6 @@
+{
+  "repeated_pairs": 128,
+  "pairs_with_changed_predictions_or_eligibility": 0,
+  "changed_pair_ids": [],
+  "new_eligible_pairs": 175
+}
