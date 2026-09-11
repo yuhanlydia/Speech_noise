@@ -1,0 +1,24 @@
+{
+  "status": "STOP_AT_BASE_GATE",
+  "evidence_tier": "post_hoc_expanded_dev_stability",
+  "eligible_pairs": 238,
+  "passes_numerical_capability_threshold": true,
+  "independent_confirmation": false,
+  "base_pair_switch_acc": 0.8949579831932774,
+  "base_absolute_threshold": 0.8,
+  "base_relative_threshold": 0.8701680672268907,
+  "stop_absolute_condition": true,
+  "stop_relative_condition": true,
+  "oracle_total_gain": null,
+  "oracle_kv_gain": null,
+  "failure_rescue_fraction": null,
+  "self_kv_gain": null,
+  "not_run": {
+    "Oracle-Prompt-only": "Base meets both TASK_V2.md step 5 stop conditions.",
+    "Oracle-KV": "Base meets both TASK_V2.md step 5 stop conditions.",
+    "Self Prompt-only": "Base meets both TASK_V2.md step 5 stop conditions.",
+    "Self Fixed-DAA": "Base meets both TASK_V2.md step 5 stop conditions.",
+    "Model-declared segmentation": "Base meets both TASK_V2.md step 5 stop conditions.",
+    "7B NF4 replication": "Base meets both TASK_V2.md step 5 stop conditions."
+  }
+}

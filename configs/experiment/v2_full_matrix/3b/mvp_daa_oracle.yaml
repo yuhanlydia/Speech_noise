@@ -1,0 +1,29 @@
+model:
+  model_id: Qwen/Qwen2.5-Omni-3B
+  quantization: nf4
+  thinker_only: true
+  device_map: auto
+  attention_backend: eager
+data:
+  manifest: data/mvp_expanded_480/pairs_eligible.jsonl
+  seed: 0
+method:
+  name: daa
+  layers: []
+  router_dim: 32
+  lambda_switch: 0.0
+  lambda_identity: 0.0
+  checkpoint: null
+  daa:
+    block_strategy: fixed
+    focus_source: oracle
+    apply_kv_mask: true
+    block_seconds: 1.5
+    max_blocks: 8
+    max_focus_blocks: 8
+    min_target_coverage: 0.8
+    scan_max_new_tokens: 192
+    select_max_new_tokens: 64
+    answer_max_new_tokens: 64
+output_dir: results/v2_full_matrix/3b/mvp_daa_oracle
+seed: 0

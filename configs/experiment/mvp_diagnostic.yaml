@@ -1,0 +1,17 @@
+model:
+  model_id: Qwen/Qwen2.5-Omni-3B
+  quantization: nf4
+  thinker_only: true
+  device_map: auto
+  attention_backend: eager
+data:
+  manifest: data/mvp/pairs_eligible.jsonl
+  seed: 0
+method:
+  name: base
+  layers: [0]
+  router_dim: 32
+  lambda_switch: 0.0
+  lambda_identity: 0.0
+output_dir: results/mvp_diagnostic
+seed: 0

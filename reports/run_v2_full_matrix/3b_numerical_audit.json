@@ -1,0 +1,24 @@
+{
+  "capability_rows_identical": true,
+  "isolated_score_vectors_checked": 960,
+  "answer_stages": {
+    "mvp_daa_oracle_prompt_only": {
+      "finite_vectors": 476,
+      "predictions_match": true
+    },
+    "mvp_daa_oracle": {
+      "finite_vectors": 476,
+      "predictions_match": true
+    },
+    "mvp_daa_prompt_only": {
+      "finite_vectors": 476,
+      "predictions_match": true
+    },
+    "mvp_daa_fixed": {
+      "finite_vectors": 476,
+      "predictions_match": true
+    }
+  },
+  "base_saved_vectors_finite": 476,
+  "ok": true
+}

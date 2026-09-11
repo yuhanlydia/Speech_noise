@@ -1,0 +1,201 @@
+{
+  "ok": true,
+  "checked_rows": 24,
+  "all_generated_prefixes_match": true,
+  "all_selections_match": true,
+  "observations": [
+    {
+      "pair_id": "dev-esc50-0001",
+      "role": "ignore",
+      "seconds": 2.9094087830744684,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 231,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0015",
+      "role": "use",
+      "seconds": 0.8650477931369096,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 65,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0033",
+      "role": "ignore",
+      "seconds": 0.7758751190267503,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 240,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0055",
+      "role": "use",
+      "seconds": 0.8341810619458556,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 65,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0087",
+      "role": "ignore",
+      "seconds": 0.7572918471414596,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 231,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0105",
+      "role": "use",
+      "seconds": 0.771793691907078,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 65,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0118",
+      "role": "ignore",
+      "seconds": 0.8187732230871916,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 252,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0131",
+      "role": "use",
+      "seconds": 0.8051114762201905,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 240,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0149",
+      "role": "ignore",
+      "seconds": 0.7875803739298135,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 184,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0166",
+      "role": "use",
+      "seconds": 0.7614419739693403,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 253,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0188",
+      "role": "ignore",
+      "seconds": 0.8965302440337837,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 263,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0204",
+      "role": "use",
+      "seconds": 0.8221691029611975,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 199,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0230",
+      "role": "ignore",
+      "seconds": 0.8296458970289677,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 182,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0249",
+      "role": "use",
+      "seconds": 0.7601051209494472,
+      "raw": "<focus_audio blocks=\"B1\">",
+      "old_chars": 65,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0269",
+      "role": "ignore",
+      "seconds": 0.784782781964168,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 122,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0282",
+      "role": "use",
+      "seconds": 0.8391941559966654,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 65,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0306",
+      "role": "ignore",
+      "seconds": 0.7733896160498261,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 65,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0330",
+      "role": "use",
+      "seconds": 0.817298972979188,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 257,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0346",
+      "role": "ignore",
+      "seconds": 0.7284153520595282,
+      "raw": "<focus_audio blocks=\"B1\">",
+      "old_chars": 251,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0369",
+      "role": "use",
+      "seconds": 0.7369353470858186,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 256,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0387",
+      "role": "ignore",
+      "seconds": 0.9299980117939413,
+      "raw": "<focus_audio blocks=\"B1\">",
+      "old_chars": 258,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0403",
+      "role": "use",
+      "seconds": 0.9274407089687884,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 65,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0426",
+      "role": "ignore",
+      "seconds": 0.829006077023223,
+      "raw": "<focus_audio blocks=\"B2\">",
+      "old_chars": 228,
+      "new_chars": 25
+    },
+    {
+      "pair_id": "dev-esc50-0449",
+      "role": "use",
+      "seconds": 0.8290524100884795,
+      "raw": "<focus_audio blocks=\"B1\">",
+      "old_chars": 65,
+      "new_chars": 25
+    }
+  ],
+  "scope": "3B fixed focus declarations; scan closing-tag equivalence covered separately by parser tests"
+}

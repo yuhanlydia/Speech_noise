@@ -1,0 +1,2 @@
+{"pair_id":"smoke-1","role":"ignore","waveform_path":"/tmp/not-loaded-in-dry-run.wav","waveform_sha256":"same-hash","query":"Ignore query","answer":"A","options":["A","B"],"event_type":"smoke"}
+{"pair_id":"smoke-1","role":"use","waveform_path":"/tmp/not-loaded-in-dry-run.wav","waveform_sha256":"same-hash","query":"Use query","answer":"B","options":["A","B"],"event_type":"smoke"}

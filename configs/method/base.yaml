@@ -1,0 +1,5 @@
+name: base
+layers: [0]
+router_dim: 32
+lambda_switch: 0.0
+lambda_identity: 0.0

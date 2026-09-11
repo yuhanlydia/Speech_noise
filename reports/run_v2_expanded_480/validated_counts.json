@@ -1,0 +1,11 @@
+{
+  "total_pairs": 480,
+  "target_only_correct": 239,
+  "event_only_correct": 478,
+  "eligible_pairs": 238,
+  "base_ignore_correct": 219,
+  "base_use_correct": 232,
+  "base_both_correct": 213,
+  "new_eligible_pairs": 175,
+  "new_base_both_correct": 157
+}

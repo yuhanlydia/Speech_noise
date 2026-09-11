@@ -1,0 +1,19 @@
+{
+  "all_oracle_declarations_match": true,
+  "matched_rows": 542,
+  "prompt_vs_base": {
+    "rescued": 8,
+    "harmed": 22,
+    "net_gain": -0.05166051660516605
+  },
+  "kv_vs_base": {
+    "rescued": 8,
+    "harmed": 28,
+    "net_gain": -0.07380073800738007
+  },
+  "kv_vs_prompt": {
+    "rescued": 7,
+    "harmed": 13,
+    "net_gain": -0.02214022140221402
+  }
+}

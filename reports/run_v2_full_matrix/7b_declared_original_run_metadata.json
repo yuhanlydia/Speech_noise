@@ -1,0 +1,47 @@
+{
+  "config": {
+    "model": {
+      "model_id": "Qwen/Qwen2.5-Omni-7B",
+      "quantization": "nf4",
+      "thinker_only": true,
+      "device_map": "auto",
+      "attention_backend": "eager",
+      "torch_dtype": "bfloat16"
+    },
+    "data": {
+      "manifest": "data/mvp_full_matrix_7b/pairs_eligible.jsonl",
+      "seed": 0
+    },
+    "method": {
+      "name": "daa",
+      "layers": [],
+      "router_dim": 32,
+      "lambda_switch": 0.0,
+      "lambda_identity": 0.0,
+      "checkpoint": null,
+      "daa": {
+        "block_strategy": "declared",
+        "focus_source": "model",
+        "apply_kv_mask": true,
+        "stop_on_complete_declaration": true,
+        "block_seconds": 1.5,
+        "max_blocks": 8,
+        "max_focus_blocks": 8,
+        "min_target_coverage": 0.8,
+        "scan_max_new_tokens": 192,
+        "select_max_new_tokens": 64,
+        "answer_max_new_tokens": 64
+      }
+    },
+    "output_dir": "results/v2_full_matrix/7b/mvp_daa_declared",
+    "seed": 0,
+    "training": {
+      "epochs": 3,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0,
+      "grad_clip_norm": 1.0
+    }
+  },
+  "records_sha256": "5860ab275b296a0d48ab5a1ef7b52a36ff3bebb18bb666419b9c4f63d3f662f6",
+  "results_sha256": "77ab5acb66ba150d8f1422b6e1d491ec7bf08e48ec1f5d65849d1c038a1633bf"
+}

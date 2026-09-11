@@ -1,0 +1,6 @@
+name: layer_router
+layers: [0, 6, 12, 18]
+router_dim: 32
+lambda_switch: 1.0
+lambda_identity: 0.1
+checkpoint: null

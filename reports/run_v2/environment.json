@@ -1,0 +1,60 @@
+{
+  "source_head": "4aebdf1e44dbbe3ac490800726f69710b72037a8",
+  "gpu": "NVIDIA RTX A4000 16376 MiB",
+  "hardware_authorization": "User explicitly requested current 16GB configuration instead of RTX 3090.",
+  "model_revision": "f75b40e3da2003cdd6e1829b1f420ca70797c34e",
+  "environment": {
+    "PYTHONPATH": "/root/Speech_noise",
+    "OMP_NUM_THREADS": "4"
+  },
+  "system_packages": [
+    "espeak-ng",
+    "ffmpeg",
+    "build-essential",
+    "python3-dev"
+  ],
+  "extra_python_packages": [
+    "torchvision",
+    "Pillow",
+    "librosa"
+  ],
+  "preparation_issues": [
+    {
+      "stage": "data preparation",
+      "error": "ModuleNotFoundError: scripts",
+      "resolution": "Set repository root in PYTHONPATH; no data-generation code change."
+    },
+    {
+      "stage": "pytest",
+      "error": "Dependency-absence test loads real model when GPU extras installed",
+      "resolution": "Test monkeypatches sys.modules[transformers] to None; 82 tests passed."
+    },
+    {
+      "stage": "capability attempt 1",
+      "error": "Processor image dependencies missing",
+      "resolution": "Installed torchvision, Pillow and librosa; processor construction verified."
+    },
+    {
+      "stage": "capability attempt 2",
+      "error": "Triton could not find C compiler",
+      "resolution": "Installed build-essential and python3-dev; complete capability run succeeded."
+    },
+    {
+      "stage": "hook identity attempt 1",
+      "error": "ImportError: apply_multimodal_rotary_pos_emb removed in installed Transformers",
+      "resolution": "Use explicit upstream rotary API selection. Added real native-attention comparison tests; real 3B NF4 identity passed with max_abs_logprob_diff=0.0."
+    }
+  ],
+  "sampled_peak_gpu_memory_mib": 4941,
+  "gpu_sampling_interval_seconds": 2,
+  "oom_events": 0,
+  "model_config": "Qwen/Qwen2.5-Omni-3B; NF4 double quantization; float16; thinker only; eager attention; device_map=auto",
+  "pytest": "84 passed in 4.83s",
+  "manifest_sha256": {
+    "data/mvp/source.jsonl": "255699cd45dd2c53f60a4f90779586fa987f90c515ec87ca1bd7e73d54e1a8e0",
+    "data/mvp/pairs.jsonl": "73aace0765836fb0188137d5c8801e31fafae199b6c1fab94f127145a5e72ee9",
+    "data/mvp/pairs_eligible.jsonl": "383a6a6598f420de9bb063c3b55c7ba7e62365eb272cf8b5845eecf170a8b294"
+  },
+  "code_commit": "c06d9fb5672a8edc3c8dc6fa402e654420416a26",
+  "review": "Independent read-only review found no blocking issues for Transformers 5.17.0. Added distinct position axes to regression inputs. Legacy API and cached generation paths were not separately integration-tested in this Base-stopped run."
+}

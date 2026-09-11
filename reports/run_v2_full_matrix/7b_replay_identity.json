@@ -1,0 +1,15 @@
+{
+  "source_failure_pairs": 9,
+  "source_failures_audited": true,
+  "source_rows": 542,
+  "ok": true,
+  "independent_fixed_pairs": 3,
+  "pair_ids": [
+    "dev-esc50-0001",
+    "dev-esc50-0353",
+    "dev-esc50-0478"
+  ],
+  "all_declarations_match": true,
+  "predictions_match": true,
+  "max_abs_logprob_diff": 0.0
+}

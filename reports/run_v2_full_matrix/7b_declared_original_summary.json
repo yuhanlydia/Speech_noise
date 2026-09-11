@@ -1,0 +1,24 @@
+{
+  "ignore_acc": 0.055350553505535055,
+  "use_acc": 0.05166051660516605,
+  "sar": 0.05344191372948213,
+  "pair_switch_acc": 0.033210332103321034,
+  "num_pairs": 271.0,
+  "selection_switch_acc": 0.045454545454545456,
+  "selection_labeled_pairs": 22.0,
+  "use_event_selection_rate": 0.36363636363636365,
+  "ignore_event_avoid_rate": 0.9090909090909091,
+  "ignore_target_coverage_mean": 0.5827621972285633,
+  "ignore_valid_selection_rate": 0.13636363636363635,
+  "reasoning_acc_given_use_selection": 0.875,
+  "reasoning_acc_given_ignore_avoidance": 0.65,
+  "reasoning_acc_given_valid_ignore_selection": 0.6666666666666666,
+  "protocol_failure_pairs": 249.0,
+  "protocol_completion_rate": 0.08118081180811808,
+  "protocol_failure_stages": {
+    "block_declaration": 249
+  },
+  "focus_source": "model",
+  "apply_kv_mask": true,
+  "block_strategy": "declared"
+}

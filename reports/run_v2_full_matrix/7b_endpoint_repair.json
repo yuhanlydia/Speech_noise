@@ -1,0 +1,1110 @@
+{
+  "ok": true,
+  "source_archive": "results/v2_full_matrix/archived_attempts/7b_declared_before_endpoint_repair",
+  "candidate_pairs_regenerated": 42,
+  "newly_parsed_pairs": 31,
+  "scope": "Original full-matrix run plus regenerated beyond-duration candidates using unchanged prompts and generation settings. Original raw failure text was not retained, so this is not pure re-parsing of historical outputs. All old parser error messages reproduced on new text.",
+  "original_pair_switch_acc": 0.033210332103321034,
+  "repaired_pair_switch_acc": 0.06642066420664207,
+  "original_valid_pairs": 22,
+  "repaired_valid_pairs": 53,
+  "3b_unchanged_failures": 238,
+  "original_successful_7b_tables_unchanged": 22,
+  "observations": [
+    {
+      "pair_id": "dev-esc50-0010",
+      "duration_s": 11.6869375,
+      "displayed_duration_s": 11.69,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.88|Speech\nB2|2.88|5.00|Speech\nB3|10.69|11.69|Car horn\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "new_parser_error": "declared blocks do not cover the audio continuously",
+      "answer_stage_recomputed": false
+    },
+    {
+      "pair_id": "dev-esc50-0028",
+      "duration_s": 11.157625,
+      "displayed_duration_s": 11.16,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.00|Speech\nB2|2.00|3.12|Speech\nB3|3.12|11.16|Goat\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.0,
+          "label": "Speech"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.0,
+          "end_s": 3.12,
+          "label": "Speech"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 3.12,
+          "end_s": 11.157625,
+          "label": "Goat"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": true
+    },
+    {
+      "pair_id": "dev-esc50-0032",
+      "duration_s": 20.6361875,
+      "displayed_duration_s": 20.64,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.64|A question your girlfriend dumps you\nB2|2.64|5.00|I knew you shouldn't have gone out with her\nB3|5.00|7.00|as your best friend who has never uttered this sentiment before\nB4|7.00|8.64|your friends comment best illustrates choices\nB5|8.64|10.00|overconfidence\nB6|10.00|11.64|the theory\nB7|11.64|13.64|see hindsight bias\nB8|13.64|20.64|the response bias\n</audio_blocks>",
+      "historical_error": "block B8 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B8 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.64,
+          "label": "A question your girlfriend dumps you"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.64,
+          "end_s": 5.0,
+          "label": "I knew you shouldn't have gone out with her"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 5.0,
+          "end_s": 7.0,
+          "label": "as your best friend who has never uttered this sentiment before"
+        },
+        {
+          "block_id": "B4",
+          "start_s": 7.0,
+          "end_s": 8.64,
+          "label": "your friends comment best illustrates choices"
+        },
+        {
+          "block_id": "B5",
+          "start_s": 8.64,
+          "end_s": 10.0,
+          "label": "overconfidence"
+        },
+        {
+          "block_id": "B6",
+          "start_s": 10.0,
+          "end_s": 11.64,
+          "label": "the theory"
+        },
+        {
+          "block_id": "B7",
+          "start_s": 11.64,
+          "end_s": 13.64,
+          "label": "see hindsight bias"
+        },
+        {
+          "block_id": "B8",
+          "start_s": 13.64,
+          "end_s": 20.6361875,
+          "label": "the response bias"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0039",
+      "duration_s": 15.3765,
+      "displayed_duration_s": 15.38,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.88|A speech synthesizer is speaking\nB2|2.88|15.38|a door is being used\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.88,
+          "label": "A speech synthesizer is speaking"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.88,
+          "end_s": 15.3765,
+          "label": "a door is being used"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0057",
+      "duration_s": 17.728875,
+      "displayed_duration_s": 17.73,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.84|A question is asked\nB2|3.84|10.00|the price of a product decreases so that the consumer can buy more of it and other products\nB3|10.00|17.73|this is called the choices\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.84,
+          "label": "A question is asked"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.84,
+          "end_s": 10.0,
+          "label": "the price of a product decreases so that the consumer can buy more of it and other products"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 10.0,
+          "end_s": 17.728875,
+          "label": "this is called the choices"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": true
+    },
+    {
+      "pair_id": "dev-esc50-0061",
+      "duration_s": 16.62675,
+      "displayed_duration_s": 16.63,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.60|A question\nB2|3.60|10.60|the rate law for the reaction of two a plus b right arrow to p is choice\nB3|10.60|16.63|a impossible to determine without experimental data b a to b c k a to b d second order with respect to a\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.6,
+          "label": "A question"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.6,
+          "end_s": 10.6,
+          "label": "the rate law for the reaction of two a plus b right arrow to p is choice"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 10.6,
+          "end_s": 16.62675,
+          "label": "a impossible to determine without experimental data b a to b c k a to b d second order with respect to a"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": true
+    },
+    {
+      "pair_id": "dev-esc50-0072",
+      "duration_s": 11.7578125,
+      "displayed_duration_s": 11.76,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.00|A question which of these pasta is spiral shaped\nB2|3.00|6.00|choices\nB3|6.00|11.76|a fettuccine\nB4|6.00|11.76|b rigatoni\nB5|6.00|11.76|c farfalle\nB6|6.00|11.76|d rotini\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "new_parser_error": "block B3 ends beyond audio duration",
+      "answer_stage_recomputed": false
+    },
+    {
+      "pair_id": "dev-esc50-0080",
+      "duration_s": 14.8496875,
+      "displayed_duration_s": 14.85,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|1.85|A question in the novel adventures of tom sawyer what is the name of tom's sweetheart choices a polly b becky c nancy d\nB2|1.88|10.85|a polly b becky c nancy d\nB3|10.85|14.85|d emma marbury\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 1.85,
+          "label": "A question in the novel adventures of tom sawyer what is the name of tom's sweetheart choices a polly b becky c nancy d"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 1.88,
+          "end_s": 10.85,
+          "label": "a polly b becky c nancy d"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 10.85,
+          "end_s": 14.8496875,
+          "label": "d emma marbury"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0114",
+      "duration_s": 28.366625,
+      "displayed_duration_s": 28.37,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.32|male_speech\nB2|2.32|28.37|baby_crying\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.32,
+          "label": "male_speech"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.32,
+          "end_s": 28.366625,
+          "label": "baby_crying"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0131",
+      "duration_s": 18.506125,
+      "displayed_duration_s": 18.51,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|10.00|Speech\nB2|10.00|18.51|Fireworks\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 10.0,
+          "label": "Speech"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 10.0,
+          "end_s": 18.506125,
+          "label": "Fireworks"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0133",
+      "duration_s": 14.75825,
+      "displayed_duration_s": 14.76,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|1.76|Speech\nB2|1.76|10.00|Speech\nB3|10.00|16.76|Crying\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "new_parser_error": "block B3 ends beyond audio duration",
+      "answer_stage_recomputed": false
+    },
+    {
+      "pair_id": "dev-esc50-0143",
+      "duration_s": 13.5403125,
+      "displayed_duration_s": 13.54,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.60|Speech\nB2|3.60|13.55|Barking\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "new_parser_error": "block B2 ends beyond audio duration",
+      "answer_stage_recomputed": false
+    },
+    {
+      "pair_id": "dev-esc50-0149",
+      "duration_s": 17.169125,
+      "displayed_duration_s": 17.17,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.00|A question for what value of b is the line y equals 10x tangent to the curve y equals e to the power of bx at some point in the xy plane\nB2|2.00|17.17|choices a ten slash e b ten c ten e d ten\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.0,
+          "label": "A question for what value of b is the line y equals 10x tangent to the curve y equals e to the power of bx at some point in the xy plane"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.0,
+          "end_s": 17.169125,
+          "label": "choices a ten slash e b ten c ten e d ten"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0153",
+      "duration_s": 13.10725,
+      "displayed_duration_s": 13.11,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.92|A question\nB2|3.92|13.11|a man speaking\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.92,
+          "label": "A question"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.92,
+          "end_s": 13.10725,
+          "label": "a man speaking"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0158",
+      "duration_s": 17.0791875,
+      "displayed_duration_s": 17.08,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|10.08|speech\nB2|10.08|17.08|frog\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 10.08,
+          "label": "speech"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 10.08,
+          "end_s": 17.0791875,
+          "label": "frog"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0163",
+      "duration_s": 13.71575,
+      "displayed_duration_s": 13.72,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.00|A question a high temperature source radiates relatively\nB2|3.00|13.72|choices a short wavelength b long wavelength c low frequency d\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.0,
+          "label": "A question a high temperature source radiates relatively"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.0,
+          "end_s": 13.71575,
+          "label": "choices a short wavelength b long wavelength c low frequency d"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": true
+    },
+    {
+      "pair_id": "dev-esc50-0167",
+      "duration_s": 22.60875,
+      "displayed_duration_s": 22.61,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.61|Question\nB2|2.61|10.00|choices\nB3|10.00|12.61|a\nB4|12.61|14.61|b\nB5|14.61|17.61|c\nB6|17.61|22.61|d\n</audio_blocks>",
+      "historical_error": "block B6 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B6 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.61,
+          "label": "Question"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.61,
+          "end_s": 10.0,
+          "label": "choices"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 10.0,
+          "end_s": 12.61,
+          "label": "a"
+        },
+        {
+          "block_id": "B4",
+          "start_s": 12.61,
+          "end_s": 14.61,
+          "label": "b"
+        },
+        {
+          "block_id": "B5",
+          "start_s": 14.61,
+          "end_s": 17.61,
+          "label": "c"
+        },
+        {
+          "block_id": "B6",
+          "start_s": 17.61,
+          "end_s": 22.60875,
+          "label": "d"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0175",
+      "duration_s": 13.698875,
+      "displayed_duration_s": 13.7,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.20|Speech\nB2|3.20|13.70|Pig\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.2,
+          "label": "Speech"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.2,
+          "end_s": 13.698875,
+          "label": "Pig"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0188",
+      "duration_s": 26.158375,
+      "displayed_duration_s": 26.16,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.88|male_speech\nB2|2.88|50.16|alarm\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "new_parser_error": "block B2 ends beyond audio duration",
+      "answer_stage_recomputed": false
+    },
+    {
+      "pair_id": "dev-esc50-0203",
+      "duration_s": 16.6886875,
+      "displayed_duration_s": 16.69,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.92|male_speech\nB2|2.92|16.69|footsteps\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.92,
+          "label": "male_speech"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.92,
+          "end_s": 16.6886875,
+          "label": "footsteps"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0231",
+      "duration_s": 13.976875,
+      "displayed_duration_s": 13.98,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.00|Speech\nB2|3.00|13.98|Fireworks\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.0,
+          "label": "Speech"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.0,
+          "end_s": 13.976875,
+          "label": "Fireworks"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0241",
+      "duration_s": 23.69675,
+      "displayed_duration_s": 23.7,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.32|A question\nB2|2.32|11.66|choices\nB3|11.66|23.70|beep\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.32,
+          "label": "A question"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.32,
+          "end_s": 11.66,
+          "label": "choices"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 11.66,
+          "end_s": 23.69675,
+          "label": "beep"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0251",
+      "duration_s": 13.152375,
+      "displayed_duration_s": 13.15,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.60|A question according to greek mythology who was\nB2|3.60|7.08|a part of twin sister\nB3|7.08|13.16|choices a aphrodite b ardemis c venus d athena\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "new_parser_error": "block B3 ends beyond audio duration",
+      "answer_stage_recomputed": false
+    },
+    {
+      "pair_id": "dev-esc50-0254",
+      "duration_s": 18.1056875,
+      "displayed_duration_s": 18.11,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.84|A question justice primarily involves\nB2|3.84|7.36|choices a recognizing fairness for all persons\nB3|7.36|10.88|b promoting accuracy and truthfulness\nB4|10.88|14.40|c benefiting others and do no harm\nB5|14.40|18.11|d respecting cultural and individual differences\n</audio_blocks>",
+      "historical_error": "block B5 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B5 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.84,
+          "label": "A question justice primarily involves"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.84,
+          "end_s": 7.36,
+          "label": "choices a recognizing fairness for all persons"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 7.36,
+          "end_s": 10.88,
+          "label": "b promoting accuracy and truthfulness"
+        },
+        {
+          "block_id": "B4",
+          "start_s": 10.88,
+          "end_s": 14.4,
+          "label": "c benefiting others and do no harm"
+        },
+        {
+          "block_id": "B5",
+          "start_s": 14.4,
+          "end_s": 18.1056875,
+          "label": "d respecting cultural and individual differences"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0281",
+      "duration_s": 16.701625,
+      "displayed_duration_s": 16.7,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.84|A question\nB2|3.84|10.00|a lot of people believe it\nB3|10.00|16.71|which of the following fallacies\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "new_parser_error": "block B3 ends beyond audio duration",
+      "answer_stage_recomputed": false
+    },
+    {
+      "pair_id": "dev-esc50-0295",
+      "duration_s": 17.35725,
+      "displayed_duration_s": 17.36,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.60|A man speaking\nB2|3.60|17.36|a frog croaking\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.6,
+          "label": "A man speaking"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.6,
+          "end_s": 17.35725,
+          "label": "a frog croaking"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0309",
+      "duration_s": 12.1784375,
+      "displayed_duration_s": 12.18,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.76|Speech\nB2|2.76|12.18|Cows\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.76,
+          "label": "Speech"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.76,
+          "end_s": 12.1784375,
+          "label": "Cows"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0334",
+      "duration_s": 13.55175,
+      "displayed_duration_s": 13.55,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.00|A question according to kant the basis of morality is the concept of\nB2|3.00|6.00|choices\nB3|6.00|9.00|a charity\nB4|9.00|12.00|b fairness\nB6|12.00|15.55|c piety\nB7|11.00|13.55|d freedom\n</audio_blocks>",
+      "historical_error": "block B6 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B6 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "new_parser_error": "block B6 ends beyond audio duration",
+      "answer_stage_recomputed": false
+    },
+    {
+      "pair_id": "dev-esc50-0339",
+      "duration_s": 13.7858125,
+      "displayed_duration_s": 13.79,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.00|A question into what body of water does the rhone river flow\nB2|3.00|6.00|a atlantic ocean\nB3|6.00|9.00|b caspian sea\nB4|9.00|12.00|c north sea\nB5|12.00|15.79|d mediterranean sea\n</audio_blocks>",
+      "historical_error": "block B5 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B5 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "new_parser_error": "block B5 ends beyond audio duration",
+      "answer_stage_recomputed": false
+    },
+    {
+      "pair_id": "dev-esc50-0343",
+      "duration_s": 16.7741875,
+      "displayed_duration_s": 16.77,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.72|male_speech\nB2|2.72|56.78|male_speech\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "new_parser_error": "block B2 ends beyond audio duration",
+      "answer_stage_recomputed": false
+    },
+    {
+      "pair_id": "dev-esc50-0344",
+      "duration_s": 17.1966875,
+      "displayed_duration_s": 17.2,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.00|A question\nB2|2.00|10.00|scientific management involved\nB3|10.00|17.20|choices\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.0,
+          "label": "A question"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.0,
+          "end_s": 10.0,
+          "label": "scientific management involved"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 10.0,
+          "end_s": 17.1966875,
+          "label": "choices"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": true
+    },
+    {
+      "pair_id": "dev-esc50-0346",
+      "duration_s": 11.9254375,
+      "displayed_duration_s": 11.93,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.00|A question sound will travel fastest in choices\nB2|3.00|11.93|a steel beam b a wooden plank c ocean water d air in a balloon\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.0,
+          "label": "A question sound will travel fastest in choices"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.0,
+          "end_s": 11.9254375,
+          "label": "a steel beam b a wooden plank c ocean water d air in a balloon"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": true
+    },
+    {
+      "pair_id": "dev-esc50-0391",
+      "duration_s": 16.488125,
+      "displayed_duration_s": 16.49,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.20|male_speech\nB2|3.20|6.40|male_speech\nB3|6.40|10.00|male_speech\nB4|10.00|16.49|baby_crying\n</audio_blocks>",
+      "historical_error": "block B4 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B4 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.2,
+          "label": "male_speech"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.2,
+          "end_s": 6.4,
+          "label": "male_speech"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 6.4,
+          "end_s": 10.0,
+          "label": "male_speech"
+        },
+        {
+          "block_id": "B4",
+          "start_s": 10.0,
+          "end_s": 16.488125,
+          "label": "baby_crying"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0392",
+      "duration_s": 18.2384375,
+      "displayed_duration_s": 18.24,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.88|A question what is cardiac output\nB2|2.88|18.24|a stroke volume times times heart rate b systemic vascular resistance times heart rate c blood pressure times heart rate d preload times stroke volume\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.88,
+          "label": "A question what is cardiac output"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.88,
+          "end_s": 18.2384375,
+          "label": "a stroke volume times times heart rate b systemic vascular resistance times heart rate c blood pressure times heart rate d preload times stroke volume"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": true
+    },
+    {
+      "pair_id": "dev-esc50-0398",
+      "duration_s": 17.0661875,
+      "displayed_duration_s": 17.07,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.96|A question\nB2|4.01|10.00|the feedback loop in women which regulates the production of sex hormones include all but which of the following choices\nB3|10.05|17.07|a intravasically progesterone c follicle stimulating hormone d pituitary gland\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.96,
+          "label": "A question"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 4.01,
+          "end_s": 10.0,
+          "label": "the feedback loop in women which regulates the production of sex hormones include all but which of the following choices"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 10.05,
+          "end_s": 17.0661875,
+          "label": "a intravasically progesterone c follicle stimulating hormone d pituitary gland"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0404",
+      "duration_s": 13.9264375,
+      "displayed_duration_s": 13.93,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.93|A question\nB2|3.93|13.93|a speech synthesizer\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.93,
+          "label": "A question"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.93,
+          "end_s": 13.9264375,
+          "label": "a speech synthesizer"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": true
+    },
+    {
+      "pair_id": "dev-esc50-0405",
+      "duration_s": 12.1375,
+      "displayed_duration_s": 12.14,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|2.88|A question an organism with a long tail\nB2|2.88|5.00|rhinoceros\nB3|5.00|12.14|and can be a choice\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 2.88,
+          "label": "A question an organism with a long tail"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 2.88,
+          "end_s": 5.0,
+          "label": "rhinoceros"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 5.0,
+          "end_s": 12.1375,
+          "label": "and can be a choice"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": true
+    },
+    {
+      "pair_id": "dev-esc50-0411",
+      "duration_s": 16.4479375,
+      "displayed_duration_s": 16.45,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.92|A man speaking\nB2|4.00|16.45|fireworks\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.92,
+          "label": "A man speaking"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 4.0,
+          "end_s": 16.4479375,
+          "label": "fireworks"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0433",
+      "duration_s": 14.569,
+      "displayed_duration_s": 14.57,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.00|A question solve the equation twenty nine equals x\nB2|3.00|6.00|x minus seventeen\nB3|6.00|10.00|choices\nB4|10.00|14.00|a twelve\nB5|14.00|18.00|b minus twelve\nB6|18.00|22.00|c minus forty six\nB7|22.00|26.00|d forty six\n</audio_blocks>",
+      "historical_error": "block B5 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B5 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "new_parser_error": "block B5 ends beyond audio duration",
+      "answer_stage_recomputed": false
+    },
+    {
+      "pair_id": "dev-esc50-0467",
+      "duration_s": 20.4165,
+      "displayed_duration_s": 20.42,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.92|A question\nB2|3.92|10.00|the instrument that has\nB3|10.00|13.12|has traditionally been used in sleep\nB4|13.12|15.92|research to assess activity in the\nB5|15.92|17.68|brain is called the choices\nB6|17.68|20.42|a signal detection device SDD\n</audio_blocks>",
+      "historical_error": "block B6 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B6 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.92,
+          "label": "A question"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.92,
+          "end_s": 10.0,
+          "label": "the instrument that has"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 10.0,
+          "end_s": 13.12,
+          "label": "has traditionally been used in sleep"
+        },
+        {
+          "block_id": "B4",
+          "start_s": 13.12,
+          "end_s": 15.92,
+          "label": "research to assess activity in the"
+        },
+        {
+          "block_id": "B5",
+          "start_s": 15.92,
+          "end_s": 17.68,
+          "label": "brain is called the choices"
+        },
+        {
+          "block_id": "B6",
+          "start_s": 17.68,
+          "end_s": 20.4165,
+          "label": "a signal detection device SDD"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0469",
+      "duration_s": 12.5483125,
+      "displayed_duration_s": 12.55,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.60|A speech synthesizer is speaking\nB2|3.60|12.55|a siren is blaring\n</audio_blocks>",
+      "historical_error": "block B2 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B2 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.6,
+          "label": "A speech synthesizer is speaking"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.6,
+          "end_s": 12.5483125,
+          "label": "a siren is blaring"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    },
+    {
+      "pair_id": "dev-esc50-0477",
+      "duration_s": 16.7555625,
+      "displayed_duration_s": 16.76,
+      "raw_block_declaration": "<audio_blocks>\nB1|0.00|3.84|A man is speaking\nB2|3.84|7.04|a train is approaching\nB3|7.04|16.76|a train is passing by\n</audio_blocks>",
+      "historical_error": "block B3 ends beyond audio duration",
+      "old_parser_error_on_regenerated_text": "block B3 ends beyond audio duration",
+      "historical_error_reproduced": true,
+      "repaired_blocks": [
+        {
+          "block_id": "B1",
+          "start_s": 0.0,
+          "end_s": 3.84,
+          "label": "A man is speaking"
+        },
+        {
+          "block_id": "B2",
+          "start_s": 3.84,
+          "end_s": 7.04,
+          "label": "a train is approaching"
+        },
+        {
+          "block_id": "B3",
+          "start_s": 7.04,
+          "end_s": 16.7555625,
+          "label": "a train is passing by"
+        }
+      ],
+      "answer_stage_recomputed": true,
+      "final_failure_stage": null,
+      "pair_correct": false
+    }
+  ]
+}

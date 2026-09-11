@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "predictions_match": true,
+  "max_abs_logprob_diff": 0.0,
+  "tolerance": 0.0001,
+  "pair_id": "dev-esc50-0001",
+  "role": "ignore",
+  "reference_prediction": "A",
+  "hook_prediction": "A"
+}

@@ -1,0 +1,47 @@
+{
+  "gpu": "NVIDIA RTX A4000 16376 MiB",
+  "dataset_revisions": {
+    "cais/mmlu": "c30699e8356da336a370243923dbaf21066bb9fe",
+    "ashraq/esc50": "e3e2a63ffff66b9a9735524551e3818e96af03ee"
+  },
+  "environment": {
+    "PYTHONPATH": "/root/Speech_noise",
+    "OMP_NUM_THREADS": "4",
+    "HF_HUB_OFFLINE": "1"
+  },
+  "manifest_sha256": {
+    "data/mvp_expanded_480/source.jsonl": "fcddce4b99e8aad26bf3a1ae0b56242fde895e5b046f308ebad7f42262d68777",
+    "data/mvp_expanded_480/pairs.jsonl": "c1748dc3461a4561aac58695a3d1651a95b66c02b3dc9d4a2fc9b750b5f23f4d",
+    "data/mvp_expanded_480/pairs_eligible.jsonl": "86ac1f13d069a2ba270bdfa43d4eee94462f6ddeb53d6d8f1295be8b8c961ee0",
+    "data/mvp_full_matrix_7b/pairs_eligible.jsonl": "4cbab9368dacbd6fba876e3f7054459bd5bd212f3249a1f4d87fe63435c7234f"
+  },
+  "gpu_sample_interval_seconds": 2,
+  "source_HEAD": "0ab5f644caff1b601f8f6385bd2a3871de0e1c86",
+  "model_revisions": {
+    "3b": "f75b40e3da2003cdd6e1829b1f420ca70797c34e",
+    "7b": "ae9e1690543ffd5c0221dc27f79834d0294cba00"
+  },
+  "replay_reproducibility": "Reuse within the same cached model revision and frozen software environment; model_id alone is not an immutable model version.",
+  "compute_dtypes": {
+    "3b": "float16",
+    "7b": "bfloat16"
+  },
+  "initial_matrix_source_HEAD": "0b63017d48268b5870c9b9dd8ee51a05e281ae38",
+  "system_dependencies": {
+    "espeak-ng": "1.50+dfsg-10ubuntu0.1",
+    "ffmpeg": "7:4.4.2-0ubuntu0.22.04.1",
+    "libsndfile1_system": "1.0.31-2ubuntu0.2",
+    "libsndfile_soundfile_runtime": "1.2.2"
+  },
+  "numerical_repair_commit": "59c47bed8c60f1cf92233fb2ee6a8dbb541b6d94",
+  "gpu_monitor_summary": {
+    "samples": 4439,
+    "first_sample_utc": "2026/09/11 03:48:40.151",
+    "last_sample_utc": "2026/09/11 06:16:38.044",
+    "sampled_peak_total_MiB": 15409,
+    "sampled_peak_total_GiB": 15.0478515625,
+    "sampling_note": "Aggregate device usage sampled every 2 seconds; includes concurrent jobs and invalid numerical probes, not an allocator-exact peak."
+  },
+  "runtime_audit": "runtime_audit.json",
+  "observed_oom_in_valid_stages": false
+}

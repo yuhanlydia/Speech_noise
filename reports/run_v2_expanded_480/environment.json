@@ -1,0 +1,26 @@
+{
+  "code_HEAD": "55a2c74cee225486d120ee4cf42e4454c6447d6c",
+  "gpu": "NVIDIA RTX A4000 16376 MiB",
+  "model_revision": "f75b40e3da2003cdd6e1829b1f420ca70797c34e",
+  "dataset_revisions": {
+    "cais/mmlu": "c30699e8356da336a370243923dbaf21066bb9fe",
+    "ashraq/esc50": "e3e2a63ffff66b9a9735524551e3818e96af03ee"
+  },
+  "environment": {
+    "PYTHONPATH": "/root/Speech_noise",
+    "OMP_NUM_THREADS": "4",
+    "HF_HUB_OFFLINE": "1"
+  },
+  "manifest_sha256": {
+    "data/mvp_expanded_480/source.jsonl": "fcddce4b99e8aad26bf3a1ae0b56242fde895e5b046f308ebad7f42262d68777",
+    "data/mvp_expanded_480/pairs.jsonl": "c1748dc3461a4561aac58695a3d1651a95b66c02b3dc9d4a2fc9b750b5f23f4d",
+    "data/mvp_expanded_480/pairs_eligible.jsonl": "86ac1f13d069a2ba270bdfa43d4eee94462f6ddeb53d6d8f1295be8b8c961ee0"
+  },
+  "configuration_validation": "All 7 configs load successfully and differ from original configs only in manifest/output paths.",
+  "runtime_source_changes_in_this_expansion": false,
+  "sampled_peak_gpu_memory_mib": 6207,
+  "gpu_sample_interval_seconds": 2,
+  "sampled_peak_gpu_utilization_pct": 100,
+  "oom_events": 0,
+  "runtime_errors_this_expansion": 0
+}
