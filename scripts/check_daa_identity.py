@@ -24,6 +24,11 @@ def main() -> None:
         default=Path("configs/experiment/mvp_daa_fixed.yaml"),
     )
     parser.add_argument("--tolerance", type=float, default=1e-4)
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("results/daa_identity/summary.json"),
+    )
     args = parser.parse_args()
 
     cfg = load_experiment_config(args.config)
@@ -79,6 +84,8 @@ def main() -> None:
             "hook_prediction": with_hook.predicted_option,
         }
     )
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, indent=2))
     if not report["ok"]:
         raise SystemExit(2)
