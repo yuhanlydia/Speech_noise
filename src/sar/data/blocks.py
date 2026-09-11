@@ -79,6 +79,19 @@ def parse_audio_blocks(text: str, *, duration_s: float, max_blocks: int) -> list
             raise ValueError(f"invalid audio block line: {line!r}")
         block_id, start, end, label = parsed.groups()
         blocks.append(AcousticBlock(block_id, float(start), float(end), label.strip()))
+    # The scan prompt displays duration to two decimal places. Interpret that
+    # exact rounded-up final endpoint as the real audio end; do not broaden
+    # validation for arbitrary overflows or change already-valid declarations.
+    if blocks:
+        last = blocks[-1]
+        displayed_end = float(f"{duration_s:.2f}")
+        if (
+            last.end_s > duration_s + 1e-6
+            and last.end_s == displayed_end
+            and 0 < displayed_end - duration_s <= 0.005 + 1e-9
+            and last.start_s < duration_s
+        ):
+            blocks[-1] = AcousticBlock(last.block_id, last.start_s, duration_s, last.label)
     validate_blocks(blocks, duration_s=duration_s, max_blocks=max_blocks)
     return blocks
 

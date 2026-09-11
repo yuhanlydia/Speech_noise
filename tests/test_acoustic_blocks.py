@@ -69,3 +69,56 @@ def test_blocks_map_to_only_selected_audio_tokens():
         selected_ids=['B2'],
     )
     assert torch.where(selected[0])[0].tolist() == [5, 6, 7, 8]
+
+
+def test_scan_displayed_endpoint_maps_to_true_audio_end():
+    from sar.methods.daa import format_scan_prompt
+
+    duration = 10.126
+    assert '10.13 seconds' in format_scan_prompt(duration_s=duration, max_blocks=8)
+    blocks = parse_audio_blocks(
+        '<audio_blocks>\nB1|0|10.13|speech\n</audio_blocks>',
+        duration_s=duration, max_blocks=8,
+    )
+    assert blocks[-1].end_s == duration
+
+
+@pytest.mark.parametrize('duration,end', [(10.124, 10.13), (10.126, 10.131), (10.126, 11)])
+def test_scan_endpoint_repair_does_not_accept_other_overflows(duration, end):
+    with pytest.raises(ValueError, match='beyond audio duration'):
+        parse_audio_blocks(
+            f'<audio_blocks>\nB1|0|{end}|speech\n</audio_blocks>',
+            duration_s=duration, max_blocks=8,
+        )
+
+
+def test_scan_endpoint_repair_does_not_change_intermediate_boundaries():
+    with pytest.raises(ValueError, match='beyond audio duration'):
+        parse_audio_blocks(
+            '<audio_blocks>\nB1|0|10.13|speech\nB2|10|10.13|bark\n</audio_blocks>',
+            duration_s=10.126, max_blocks=8,
+        )
+
+
+def test_scan_endpoint_repair_does_not_create_empty_span():
+    with pytest.raises(ValueError, match='beyond audio duration'):
+        parse_audio_blocks(
+            '<audio_blocks>\nB1|0|10|speech\nB2|10.128|10.13|bark\n</audio_blocks>',
+            duration_s=10.126, max_blocks=8,
+        )
+
+
+def test_scan_endpoint_repair_keeps_other_validation():
+    with pytest.raises(ValueError, match='overlap'):
+        parse_audio_blocks(
+            '<audio_blocks>\nB1|0|8|speech\nB2|7|10.13|bark\n</audio_blocks>',
+            duration_s=10.126, max_blocks=8,
+        )
+
+
+def test_scan_endpoint_repair_preserves_already_accepted_endpoint():
+    blocks = parse_audio_blocks(
+        '<audio_blocks>\nB1|0|10.13|speech\n</audio_blocks>',
+        duration_s=10.1299995, max_blocks=8,
+    )
+    assert blocks[-1].end_s == 10.13
