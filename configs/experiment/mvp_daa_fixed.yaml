@@ -5,7 +5,7 @@ model:
   device_map: auto
   attention_backend: eager
 data:
-  manifest: data/mvp/pairs.jsonl
+  manifest: data/mvp/pairs_eligible.jsonl
   seed: 0
 method:
   name: daa
@@ -16,9 +16,12 @@ method:
   checkpoint: null
   daa:
     block_strategy: fixed
+    focus_source: model
+    apply_kv_mask: true
     block_seconds: 1.5
     max_blocks: 8
     max_focus_blocks: 8
+    min_target_coverage: 0.8
     scan_max_new_tokens: 192
     select_max_new_tokens: 64
     answer_max_new_tokens: 64
