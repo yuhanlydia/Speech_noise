@@ -1,6 +1,8 @@
 import json
 from dataclasses import dataclass
 
+import pytest
+
 from sar.models.base import OptionScores
 from sar.validity import (
     evaluate_capability_pairs,
@@ -30,6 +32,15 @@ class FakeWrapper:
             list(options),
             [0.0 if option == pred else -3.0 for option in options],
         )
+
+
+class BrokenCanonicalWrapper:
+    def score_single_token_options(self, audio_path, query, options):
+        raise ValueError("canonical scorer broken")
+
+    def score_options(self, audio_path, query, options):
+        # This fallback must never hide a canonical-scoring integration error.
+        return OptionScores(list(options), [0.0, -1.0, -2.0, -3.0])
 
 
 def _records():
@@ -72,3 +83,14 @@ def test_capability_gate_requires_both_isolated_tasks_correct(tmp_path):
     assert summary["num_pairs"] == 2
     assert summary["eligible_pairs"] == 1
     assert summary["eligibility_rate"] == 0.5
+
+
+def test_capability_gate_does_not_silently_fallback_when_canonical_scorer_breaks(tmp_path):
+    source = tmp_path / "source.jsonl"
+    source.write_text(
+        json.dumps({"pair_id": "p1", "target_wav": "target1.wav", "event_wav": "event1.wav"}) + "\n",
+        encoding="utf-8",
+    )
+    pair = _records()[:2]
+    with pytest.raises(ValueError, match="canonical scorer broken"):
+        evaluate_capability_pairs(BrokenCanonicalWrapper(), pair, source)
