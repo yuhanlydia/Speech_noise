@@ -51,6 +51,7 @@ class FakeWrapper:
         selected_ids,
         *,
         layers,
+        apply_kv_mask=True,
     ):
         gold = 'B' if 'animal' in query else 'C'
         return OptionScores(options, [0.0 if option == gold else -2.0 for option in options])
@@ -89,6 +90,8 @@ def test_pipeline_declares_blocks_once_and_switches_focus_by_query():
     assert by_role['use']['selected_blocks'] == ['B2']
     assert by_role['ignore']['event_selected'] is False
     assert by_role['use']['event_selected'] is True
+    assert by_role['ignore']['target_coverage'] == 1.0
+    assert by_role['ignore']['ignore_selection_valid'] is True
     summary = summarize_daa_rows(rows)
     assert summary['selection_switch_acc'] == 1.0
     assert summary['pair_switch_acc'] == 1.0
@@ -112,8 +115,5 @@ def test_event_selection_requires_event_midpoint_not_tiny_overlap():
         AcousticBlock('B1', 0.0, 1.0, 'speech'),
         AcousticBlock('B2', 1.0, 2.0, 'dog bark'),
     ]
-    # B1 overlaps only the first 0.05 s of the event. Selection is credited only
-    # to the block containing the event midpoint (1.25 s), so edge overlap cannot
-    # inflate selection accuracy.
     assert _event_selected(record, blocks, ['B1']) is False
     assert _event_selected(record, blocks, ['B2']) is True
