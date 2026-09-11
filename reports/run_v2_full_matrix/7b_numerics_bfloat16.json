@@ -1,0 +1,478 @@
+{
+  "dtype": "bfloat16",
+  "pair_id": "dev-esc50-0001",
+  "reference": [
+    -0.314453125,
+    -3.75,
+    -1.5625,
+    -4.0
+  ],
+  "masked": [
+    -0.314453125,
+    -3.75,
+    -1.5625,
+    -4.0
+  ],
+  "isolated_scores": {
+    "target_wav": {
+      "scores": [
+        -0.2275390625,
+        -4.46875,
+        -1.7265625,
+        -4.34375
+      ],
+      "prediction": "A"
+    },
+    "event_wav": {
+      "scores": [
+        -7.1875,
+        -8.0,
+        -0.0029754638671875,
+        -6.8125
+      ],
+      "prediction": "C"
+    }
+  },
+  "activations": [
+    {
+      "module": "audio_tower.layers.0",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.1",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.2",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.3",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.4",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.5",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.6",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.7",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.8",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.9",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.10",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.11",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.12",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.13",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.14",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.15",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.16",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.17",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.18",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.19",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.20",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.21",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.22",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.23",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.24",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.25",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.26",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.27",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.28",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.29",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.30",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower.layers.31",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "audio_tower",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.0",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.1",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.2",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.3",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.4",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.5",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.6",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.7",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.8",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.9",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.10",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.11",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.12",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.13",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.14",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.15",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.16",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.17",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.18",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.19",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.20",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.21",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.22",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.23",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.24",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.25",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.26",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "model.layers.27",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    },
+    {
+      "module": "lm_head",
+      "finite": true,
+      "dtypes": [
+        "torch.bfloat16"
+      ]
+    }
+  ],
+  "device_map": {
+    "parameter_devices": [
+      "cuda:0"
+    ]
+  },
+  "bf16_supported": true
+}

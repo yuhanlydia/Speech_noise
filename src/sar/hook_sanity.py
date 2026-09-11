@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from sar.models.base import OptionScores
+import math
+
+from sar.models.base import NonFiniteScoreError, OptionScores
 
 
 def compare_score_vectors(
@@ -13,6 +15,8 @@ def compare_score_vectors(
         raise ValueError("score vectors must use identical option ordering")
     if tolerance <= 0:
         raise ValueError("tolerance must be positive")
+    if not all(math.isfinite(value) for value in [*reference.logprobs, *masked.logprobs]):
+        raise NonFiniteScoreError("non-finite hook identity scores")
     diffs = [
         abs(float(a) - float(b))
         for a, b in zip(reference.logprobs, masked.logprobs)

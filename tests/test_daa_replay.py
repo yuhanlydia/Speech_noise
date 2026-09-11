@@ -109,7 +109,8 @@ def test_replay_rejects_non_finite_answer_scores():
         def score_single_token_options_daa(self, *args, **kwargs):
             return OptionScores(["A", "B"], [float("nan"), -1.0])
 
-    with pytest.raises(ValueError, match="non-finite"):
+    from sar.models.base import NonFiniteScoreError
+    with pytest.raises(NonFiniteScoreError, match="non-finite"):
         evaluate_replay_with_wrapper(target, source, NonFinite(), records, cached,
                                      duration_resolver=lambda _: 2.0)
 

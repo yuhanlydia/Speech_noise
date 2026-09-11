@@ -56,7 +56,10 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
             raise RuntimeError("call load() before generation")
         inputs = self.prepare_inputs(audio_path, prompt)
         prompt_len = int(inputs["input_ids"].shape[1])
-        generation_kwargs = {}
+        from transformers import LogitsProcessorList
+        from sar.generation_stopping import FiniteGenerationScores
+
+        generation_kwargs = {"logits_processor": LogitsProcessorList([FiniteGenerationScores()])}
         if self.stop_on_complete_declaration and declaration_kind is not None:
             from transformers import StoppingCriteriaList
             from sar.generation_stopping import DeclarationStoppingCriteria
@@ -222,6 +225,9 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
     ) -> str:
         if self.model is None or self.processor is None:
             raise RuntimeError("call load() before DAA generation")
+        from transformers import LogitsProcessorList
+        from sar.generation_stopping import FiniteGenerationScores
+
         focused_query = self.focused_query(query, blocks, selected_ids)
         inputs = self.prepare_inputs(audio_path, focused_query)
         prompt_len = int(inputs["input_ids"].shape[1])
@@ -245,6 +251,7 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
                     max_new_tokens=max_new_tokens,
                     do_sample=False,
                     use_cache=True,
+                    logits_processor=LogitsProcessorList([FiniteGenerationScores()]),
                 )
         finally:
             if restore is not None:

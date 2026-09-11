@@ -52,6 +52,7 @@ def _build_wrapper(cfg: ExperimentConfig) -> QwenOmniWrapper:
             thinker_only=cfg.model.thinker_only,
             device_map=cfg.model.device_map,
             attention_backend=cfg.model.attention_backend,
+            torch_dtype=cfg.model.torch_dtype,
             routing_layer=cfg.method.layers[0],
         )
     )

@@ -23,6 +23,7 @@ from sar.data.relevance_pairs import load_jsonl_records
 from sar.data.schema import validate_pair_records
 from sar.eval import write_results
 from sar.methods.daa import parse_focus_declaration
+from sar.models.base import NonFiniteScoreError
 
 
 def validate_replay_inputs(cfg, source_cfg, records, source_rows, *, duration_resolver=_duration_s):
@@ -105,7 +106,7 @@ def evaluate_replay_with_wrapper(cfg, source_cfg, wrapper, records, source_rows,
                 layers=cfg.method.layers, apply_kv_mask=True,
             )
             if any(not math.isfinite(value) for value in scores.logprobs):
-                raise ValueError("non-finite replay answer scores")
+                raise NonFiniteScoreError("non-finite replay answer scores")
             row.update(prediction=scores.predicted_option,
                        correct=scores.predicted_option == record.answer,
                        logprobs=scores.logprobs)

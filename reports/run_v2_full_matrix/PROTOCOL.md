@@ -63,8 +63,9 @@ For matched self controls, compare the actual generated declarations as well
 as final answer accuracy. Report any mismatches rather than attributing every
 observed difference to KV alone.
 
-Two independent 3B conditions may run concurrently when memory permits. The
-7B model initially runs alone. Hardware/runtime errors may lead to a serial
+Independent conditions may run concurrently when memory permits. The
+7B capability stage was also tested concurrently with the 3B segmentation run
+when measured memory left sufficient room. Hardware/runtime errors may lead to a serial
 retry, documented as an execution adjustment, not a change to the experiment.
 
 ### Recorded declaration reuse
@@ -110,3 +111,10 @@ The already-running independent 3B Self and declared stages retain their
 original decoding. Enable the optimization for subsequent 7B Self/declared
 stages only after the real 3B prefix/selection checks and parser tests pass.
 It is an execution optimization, not a new acoustic selection method.
+
+## Numerical repair
+
+The initial 7B FP16 attempt was invalidated after detecting non-finite scores.
+All seven 7B configs now explicitly select BF16 and the capability cohort must
+be rebuilt. 3B retains FP16 with a separate finite-score audit. See
+NUMERICAL_FIX.md for the actual probe evidence and fail-fast repair.

@@ -20,5 +20,9 @@
     "3b": "f75b40e3da2003cdd6e1829b1f420ca70797c34e",
     "7b": "ae9e1690543ffd5c0221dc27f79834d0294cba00"
   },
-  "replay_reproducibility": "Reuse within the same cached model revision and frozen software environment; model_id alone is not an immutable model version."
+  "replay_reproducibility": "Reuse within the same cached model revision and frozen software environment; model_id alone is not an immutable model version.",
+  "compute_dtypes": {
+    "3b": "float16",
+    "7b": "bfloat16"
+  }
 }

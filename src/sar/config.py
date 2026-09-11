@@ -17,6 +17,7 @@ class ModelConfig(StrictModel):
     thinker_only: bool = True
     device_map: str = "auto"
     attention_backend: str = "eager"
+    torch_dtype: Literal["float16", "bfloat16", "float32"] = "float16"
 
 
 class DataConfig(StrictModel):

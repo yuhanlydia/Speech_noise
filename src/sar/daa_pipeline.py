@@ -5,6 +5,7 @@ from typing import Sequence
 
 from sar.data.blocks import AcousticBlock, fixed_temporal_blocks
 from sar.metrics import compute_pair_metrics
+from sar.models.base import NonFiniteScoreError
 
 
 class DAAStageError(RuntimeError):
@@ -151,6 +152,8 @@ def run_daa_pair(
                     max_blocks=max_blocks,
                     max_new_tokens=scan_max_new_tokens,
                 )
+            except NonFiniteScoreError:
+                raise
             except Exception as exc:
                 raise DAAStageError("block_declaration", str(exc)) from exc
         elif block_strategy == "fixed":
@@ -185,6 +188,8 @@ def run_daa_pair(
                     max_selected=max_focus_blocks,
                     max_new_tokens=select_max_new_tokens,
                 )
+            except NonFiniteScoreError:
+                raise
             except Exception as exc:
                 raise DAAStageError(f"focus_{record.role}", str(exc)) from exc
 
@@ -202,6 +207,8 @@ def run_daa_pair(
                 layers=layers,
                 apply_kv_mask=apply_kv_mask,
             )
+        except NonFiniteScoreError:
+            raise
         except Exception as exc:
             raise DAAStageError(
                 f"focused_reasoning_{record.role}", str(exc)
@@ -231,6 +238,7 @@ def run_daa_pair(
                 "waveform_sha256": record.waveform_sha256,
                 "answer": record.answer,
                 "prediction": scores.predicted_option,
+                "logprobs": scores.logprobs,
                 "correct": scores.predicted_option == record.answer,
                 "selected_blocks": list(selected_ids),
                 "event_selected": event_selected,
