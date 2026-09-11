@@ -1,0 +1,76 @@
+{
+  "ok": true,
+  "valid_run_logs": {
+    "results/v2_full_matrix/execution/3b_oracle_prompt.log": {
+      "sha256": "1e96c5acdb17e299b46b304e34487db4cd3549efc6bdded5eee0f30a08d510b3",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/3b_oracle_kv.log": {
+      "sha256": "fa06ebff397183235ca149da4b6034a48cf46473b43c76f7a92545fb0c2c22c2",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/3b_self_prompt.log": {
+      "sha256": "270824cec28afa949e5b5562c990b16c9092354a31dd4a26eea5ae16c2618935",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/3b_fixed.log": {
+      "sha256": "8aaae959e2d2bccca72e2fd945ad547404ae836f44963d99b95424cdf3392817",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/3b_declared.log": {
+      "sha256": "7f67ee89acb5925b74c739e0d4142e9772e4c33abd064c424f2b73f3dbd3ee2b",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/7b_oracle_prompt.log": {
+      "sha256": "3cf930f18bba41295e0bfdee1a838334e238322b728ea189b2a1dd74ff067a6a",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/7b_oracle_kv.log": {
+      "sha256": "c228444e77cb68fd362c95303ef2a53ef634ebf06533430512314b6a41990e82",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/7b_self_prompt.log": {
+      "sha256": "a15a8ffba436022d68648d94d84f8931be0d9729d744d27067aa768fc52b7f88",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/7b_fixed.log": {
+      "sha256": "05c5dd48bb1b89eae33f07ced363d8f7a3adff83a73930aa56554d501245994e",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/7b_declared.log": {
+      "sha256": "b0bd9251dbcaec1a7855f3d2029907bb4af2a037934fa2b6e7b3d06a346f3983",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/7b_capability.log": {
+      "sha256": "72e8c346c474281767250795512bffae7643e628f5f2add9729861a6a25fa222",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/7b_identity.log": {
+      "sha256": "16951607c117ba0752506f129d86c363d65f87ebe2622d2d019888a314eace1b",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/7b_base.log": {
+      "sha256": "ef0afc286d6cdda3c77697d015169d675d01ceab1897f50afce75b75ae6c1326",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/7b_replay_identity.log": {
+      "sha256": "810895054530ff5af4ef105dc82da0ce52afed5117a15c18ae932ec7fcfebc18",
+      "runtime_error_markers": []
+    },
+    "results/v2_full_matrix/execution/7b_endpoint_repair.log": {
+      "sha256": "b3ab92910d5d9a65c12d103461c2601bb0f98a43c9b7cefdf7d5da6732d37df7",
+      "runtime_error_markers": []
+    }
+  },
+  "invalid_fp16_attempt_excluded": true,
+  "note": "Valid stage logs contain no matched runtime-error markers; all final DAA failure rows inspected for numerical/CUDA errors. The earlier FP16 numerical failure is separately documented.",
+  "7b_stored_finite_score_vectors": {
+    "mvp_capability_gate": 960,
+    "mvp_diagnostic": 542,
+    "mvp_daa_oracle_prompt_only": 542,
+    "mvp_daa_oracle": 542,
+    "mvp_daa_prompt_only": 524,
+    "mvp_daa_declared": 106,
+    "mvp_daa_fixed": 524
+  }
+}

@@ -118,3 +118,9 @@ The initial 7B FP16 attempt was invalidated after detecting non-finite scores.
 All seven 7B configs now explicitly select BF16 and the capability cohort must
 be rebuilt. 3B retains FP16 with a separate finite-score audit. See
 NUMERICAL_FIX.md for the actual probe evidence and fail-fast repair.
+
+## Declared endpoint contract repair
+
+After the original full matrix finished, a mismatch between the two-decimal scan duration and the strict endpoint validator was repaired without changing prompts. The 7B segmentation report combines unaffected original rows with 31 newly valid, freshly evaluated cases from 42 regenerated overflow candidates. See ENDPOINT_REPAIR.md for the original result, exact rule, tests, and limits of historical raw-text evidence. This repair does not affect Base, Oracle, or fixed-block controls.
+
+After local artifacts exist, `python reports/run_v2_full_matrix/recompute_report.py` independently checks their sample sets, hashes, and metrics and regenerates the JSON/CSV comparisons and stage exports.

@@ -1,0 +1,10 @@
+{
+  "model": "3b",
+  "oracle_controls_match": true,
+  "verified_rows": 476,
+  "oracle_prompt_gain": -0.07142857142857151,
+  "oracle_total_gain": -0.10084033613445387,
+  "oracle_kv_gain": -0.02941176470588236,
+  "failure_rescue_fraction": -0.9600000000000012,
+  "continued_despite_negative_gains": true
+}

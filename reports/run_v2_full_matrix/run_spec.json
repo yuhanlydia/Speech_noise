@@ -18,5 +18,13 @@
   "reused_from": "results/v2_expanded_480",
   "historical_reports_preserved": true,
   "independent_confirmation": false,
-  "eligibility_policy": "Model-specific isolated capability cohorts for main metrics; also report shared-eligible comparisons. Do not interpret cohort differences as causal model improvements."
+  "eligibility_policy": "Model-specific isolated capability cohorts for main metrics; also report shared-eligible comparisons. Do not interpret cohort differences as causal model improvements.",
+  "implementation_commit": "0ab5f644caff1b601f8f6385bd2a3871de0e1c86",
+  "valid_model_eligible_pairs": {
+    "3b": 238,
+    "7b": 271
+  },
+  "shared_eligible_pairs": 184,
+  "status": "complete",
+  "declared_endpoint_repair": "ENDPOINT_REPAIR.md"
 }

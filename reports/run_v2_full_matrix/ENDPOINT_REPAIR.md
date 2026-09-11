@@ -32,3 +32,9 @@ subset-regenerated repair and preserves the original all-pair result. All 238
 3B ablation failures were missing tags or invalid lines, which occur before
 this endpoint rule and are unaffected. All originally successful 7B tables are
 also checked for exact equality under the repaired parser.
+
+## Observed repair outcome
+
+All 42 candidates reproduced their historical old-parser error message on the newly generated text. The repaired parser accepted 31; their answers were freshly evaluated. All 31 reached answer evaluation, increasing completed pairs from 22 to 53, and pair successes from 9 to 18. The repaired combined result is 18/271 (6.64%); 218 pairs remain declaration failures. The other 11 candidates remain unsuccessful. Their new parser errors are recorded alongside their preserved historical failure rows.
+
+The original 22 successful tables are exactly unchanged, and all 238 3B missing-tag/invalid-line failures occur before the repaired rule. See [per-case evidence](7b_endpoint_repair.json), [original summary](7b_declared_original_summary.json), and [original producer receipt](7b_declared_original_run_metadata.json).

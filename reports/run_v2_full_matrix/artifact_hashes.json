@@ -1,0 +1,14 @@
+{
+  "results/v2_full_matrix/3b/mvp_diagnostic/results.jsonl": "0b351402fd837fc723b4244ca2754c6567794a56dd7990a57c35d97acb51da05",
+  "results/v2_full_matrix/3b/mvp_daa_oracle_prompt_only/results.jsonl": "d9494846e80eeb3ad3d82f8e3b74837e6724d6cf433077937d17c39f80275562",
+  "results/v2_full_matrix/3b/mvp_daa_oracle/results.jsonl": "8bb9aa641fdfdd54c43d2ba727bbc7c6133acfe8bdee1ff4cc6072252d50dfad",
+  "results/v2_full_matrix/3b/mvp_daa_prompt_only/results.jsonl": "6ce9ee3510ec85c58e6d2d1a5aab3afd3d71e3c77b19978161771fa18a82d7bf",
+  "results/v2_full_matrix/3b/mvp_daa_fixed/results.jsonl": "4b91f59f13af23e7c852af6b522869c9326d81086eed3ef7d8d3650fca0259c3",
+  "results/v2_full_matrix/3b/mvp_daa_declared/results.jsonl": "1daa0fc73baf7ff50444d10b6206825ecd84988da77897e52c1d4c7743c92b01",
+  "results/v2_full_matrix/7b/mvp_diagnostic/results.jsonl": "f7f8b02ba35cbd637fc94485b0076eaaee7ed3b28c2219cfdf5ee92ae97fc14f",
+  "results/v2_full_matrix/7b/mvp_daa_oracle_prompt_only/results.jsonl": "bb0a758bf3eafbac7c5ac9c19ee30d0f567a96f6b9e56404e853d406755c4165",
+  "results/v2_full_matrix/7b/mvp_daa_oracle/results.jsonl": "9cc143f9581594f9a2f8f82855f0410fbd695eee4c42e5a52de32bd66af94060",
+  "results/v2_full_matrix/7b/mvp_daa_prompt_only/results.jsonl": "c8c50b24dfe6472772fd89c2f8c2a57f25285e02213f0096fdc235510c10fcd6",
+  "results/v2_full_matrix/7b/mvp_daa_fixed/results.jsonl": "02de3729957f9e5a611e93e13be26ca6df55be6ee89a7b81c3067b4df7a818d8",
+  "results/v2_full_matrix/7b/mvp_daa_declared/results.jsonl": "9a8166d5e007451442ac3fc57f6612559ac1f394fb8310c60d69ce807a71cd7f"
+}
