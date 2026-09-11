@@ -6,6 +6,7 @@ from pathlib import Path
 
 STAGES = {
     "capability": "mvp_capability_gate",
+    "hook_identity": "daa_identity",
     "base": "mvp_diagnostic",
     "oracle_prompt_only": "mvp_daa_oracle_prompt_only",
     "oracle_kv": "mvp_daa_oracle",
