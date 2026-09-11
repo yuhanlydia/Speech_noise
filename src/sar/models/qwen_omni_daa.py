@@ -16,12 +16,7 @@ from sar.models.qwen_omni import QwenOmniWrapper
 
 
 class QwenOmniDAAWrapper(QwenOmniWrapper):
-    """Declarative Acoustic Attention extension for the Qwen2.5-Omni Thinker.
-
-    Global block declaration and per-query focus selection use the off-the-shelf
-    Speech LM itself. The final reasoning pass enforces the declaration by masking
-    unselected audio keys before softmax for post-audio consumer tokens.
-    """
+    """Declarative Acoustic Attention extension for the Qwen2.5-Omni Thinker."""
 
     @staticmethod
     def focus_tag(selected_ids: Sequence[str]) -> str:
@@ -31,9 +26,11 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
 
     @classmethod
     def focused_query(cls, query: str, selected_ids: Sequence[str]) -> str:
+        # Keep this prompt identical for prompt-only and KV-mask conditions so the
+        # causal comparison isolates the runtime attention intervention.
         return (
             f"{query}\n\n{cls.focus_tag(selected_ids)}\n"
-            "The runtime has restricted acoustic attention to the declared block(s). "
+            "The declaration above identifies the acoustic region selected for this query. "
             "Answer the question using the available acoustic evidence."
         )
 
@@ -105,7 +102,9 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
         out = []
         for idx in layers:
             if idx < 0 or idx >= len(all_layers):
-                raise IndexError(f"DAA layer {idx} outside 0..{len(all_layers) - 1}")
+                raise IndexError(
+                    f"DAA layer {idx} outside 0..{len(all_layers) - 1}"
+                )
             out.append(all_layers[idx].self_attn)
         return out
 
@@ -152,29 +151,34 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
         selected_ids: Sequence[str],
         *,
         layers: Sequence[int],
+        apply_kv_mask: bool = True,
     ) -> OptionScores:
         if self.model is None or self.processor is None:
             raise RuntimeError("call load() before DAA scoring")
         option_ids = self.single_token_option_ids(self.processor.tokenizer, options)
         focused_query = self.focused_query(query, selected_ids)
         inputs = self.prepare_inputs(audio_path, focused_query)
-        controller = self._daa_controller_for_inputs(
-            inputs,
-            duration_s=self._audio_duration(audio_path),
-            blocks=blocks,
-            selected_ids=selected_ids,
-        )
-        restore = install_daa_on_qwen_layers(
-            self._resolve_daa_layers(layers),
-            controller,
-        )
+
+        restore = None
+        if apply_kv_mask:
+            controller = self._daa_controller_for_inputs(
+                inputs,
+                duration_s=self._audio_duration(audio_path),
+                blocks=blocks,
+                selected_ids=selected_ids,
+            )
+            restore = install_daa_on_qwen_layers(
+                self._resolve_daa_layers(layers),
+                controller,
+            )
         try:
             with torch.no_grad():
                 outputs = self.model(**inputs, use_cache=False)
                 logp = torch.log_softmax(outputs.logits[0, -1], dim=-1)
                 scores = [float(logp[idx].item()) for idx in option_ids]
         finally:
-            restore()
+            if restore is not None:
+                restore()
         return OptionScores(options=list(options), logprobs=scores)
 
     def generate_answer_daa(
@@ -186,22 +190,26 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
         *,
         layers: Sequence[int],
         max_new_tokens: int,
+        apply_kv_mask: bool = True,
     ) -> str:
         if self.model is None or self.processor is None:
             raise RuntimeError("call load() before DAA generation")
         focused_query = self.focused_query(query, selected_ids)
         inputs = self.prepare_inputs(audio_path, focused_query)
         prompt_len = int(inputs["input_ids"].shape[1])
-        controller = self._daa_controller_for_inputs(
-            inputs,
-            duration_s=self._audio_duration(audio_path),
-            blocks=blocks,
-            selected_ids=selected_ids,
-        )
-        restore = install_daa_on_qwen_layers(
-            self._resolve_daa_layers(layers),
-            controller,
-        )
+
+        restore = None
+        if apply_kv_mask:
+            controller = self._daa_controller_for_inputs(
+                inputs,
+                duration_s=self._audio_duration(audio_path),
+                blocks=blocks,
+                selected_ids=selected_ids,
+            )
+            restore = install_daa_on_qwen_layers(
+                self._resolve_daa_layers(layers),
+                controller,
+            )
         try:
             with torch.no_grad():
                 output_ids = self.model.generate(
@@ -211,7 +219,8 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
                     use_cache=True,
                 )
         finally:
-            restore()
+            if restore is not None:
+                restore()
         generated = output_ids[0, prompt_len:]
         return self.processor.tokenizer.decode(
             generated,
