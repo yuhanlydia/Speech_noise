@@ -4,7 +4,12 @@ from typing import Sequence
 
 import torch
 
-from sar.data.blocks import AcousticBlock, blocks_to_audio_token_mask, parse_audio_blocks
+from sar.data.blocks import (
+    AcousticBlock,
+    blocks_to_audio_token_mask,
+    format_block_table,
+    parse_audio_blocks,
+)
 from sar.methods.daa import format_focus_prompt, format_scan_prompt, parse_focus_declaration
 from sar.models.base import OptionScores
 from sar.models.daa_hook import (
@@ -25,11 +30,20 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
         return f'<focus_audio blocks="{",".join(selected_ids)}">'
 
     @classmethod
-    def focused_query(cls, query: str, selected_ids: Sequence[str]) -> str:
-        # Keep this prompt identical for prompt-only and KV-mask conditions so the
-        # causal comparison isolates the runtime attention intervention.
+    def focused_query(
+        cls,
+        query: str,
+        blocks: Sequence[AcousticBlock],
+        selected_ids: Sequence[str],
+    ) -> str:
+        # Prompt-only and KV-mask conditions must receive exactly the same textual
+        # information. Including the address table makes a declaration such as B2
+        # meaningful even when the runtime mask is disabled.
         return (
-            f"{query}\n\n{cls.focus_tag(selected_ids)}\n"
+            "Acoustic address table:\n"
+            f"{format_block_table(blocks)}\n\n"
+            f"Question: {query}\n"
+            f"{cls.focus_tag(selected_ids)}\n"
             "The declaration above identifies the acoustic region selected for this query. "
             "Answer the question using the available acoustic evidence."
         )
@@ -156,7 +170,7 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
         if self.model is None or self.processor is None:
             raise RuntimeError("call load() before DAA scoring")
         option_ids = self.single_token_option_ids(self.processor.tokenizer, options)
-        focused_query = self.focused_query(query, selected_ids)
+        focused_query = self.focused_query(query, blocks, selected_ids)
         inputs = self.prepare_inputs(audio_path, focused_query)
 
         restore = None
@@ -194,7 +208,7 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
     ) -> str:
         if self.model is None or self.processor is None:
             raise RuntimeError("call load() before DAA generation")
-        focused_query = self.focused_query(query, selected_ids)
+        focused_query = self.focused_query(query, blocks, selected_ids)
         inputs = self.prepare_inputs(audio_path, focused_query)
         prompt_len = int(inputs["input_ids"].shape[1])
 
