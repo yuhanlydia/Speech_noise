@@ -22,6 +22,8 @@ def dry_run_daa(config_path: str | Path) -> dict:
         "model": cfg.model.model_id,
         "method": cfg.method.name,
         "block_strategy": cfg.method.daa.block_strategy,
+        "focus_source": cfg.method.daa.focus_source,
+        "apply_kv_mask": cfg.method.daa.apply_kv_mask,
         "records": len(records),
         "pairs": len({record.pair_id for record in records}),
         "layers": cfg.method.layers,
@@ -72,6 +74,8 @@ def _failure_rows(
             "correct": False,
             "selected_blocks": [],
             "event_selected": None,
+            "target_coverage": None,
+            "ignore_selection_valid": None,
             "daa_error_stage": error.stage,
             "daa_error": str(error),
         }
@@ -109,6 +113,9 @@ def evaluate_daa_with_wrapper(
                 scan_max_new_tokens=daa.scan_max_new_tokens,
                 select_max_new_tokens=daa.select_max_new_tokens,
                 layers=cfg.method.layers,
+                focus_source=daa.focus_source,
+                apply_kv_mask=daa.apply_kv_mask,
+                min_target_coverage=daa.min_target_coverage,
             )
         except DAAStageError as exc:
             failed_pairs += 1
@@ -122,6 +129,9 @@ def evaluate_daa_with_wrapper(
         (len(pairs) - failed_pairs) / max(len(pairs), 1)
     )
     summary["protocol_failure_stages"] = stage_counts
+    summary["focus_source"] = daa.focus_source
+    summary["apply_kv_mask"] = daa.apply_kv_mask
+    summary["block_strategy"] = daa.block_strategy
     return rows, summary
 
 
@@ -135,7 +145,9 @@ def evaluate_daa(cfg: ExperimentConfig) -> tuple[list[dict], dict]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Declarative Acoustic Attention evaluator")
+    parser = argparse.ArgumentParser(
+        description="Declarative Acoustic Attention evaluator"
+    )
     parser.add_argument("--config", required=True, type=Path)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
