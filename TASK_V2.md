@@ -58,14 +58,23 @@ bash scripts/run_diagnostic.sh
 cat results/mvp_diagnostic/summary.json
 ```
 
-STOP the project if:
+STOP the whole project if:
 
 ```text
 PairSwitchAcc >= 0.80
 AND PairSwitchAcc >= min(IgnoreAcc, UseAcc) - 0.05
 ```
 
-## 5. Oracle-KV — mandatory before self-declared DAA
+## 5. Oracle location controls — mandatory before self-declared DAA
+
+First test whether simply telling the model the ground-truth acoustic region helps, without modifying KV:
+
+```bash
+bash scripts/run_daa.sh configs/experiment/mvp_daa_oracle_prompt_only.yaml
+cat results/mvp_daa_oracle_prompt_only/summary.json
+```
+
+Then apply the exact same oracle address table and focus declaration with the runtime KV mask:
 
 ```bash
 bash scripts/run_daa.sh configs/experiment/mvp_daa_oracle.yaml
@@ -75,14 +84,20 @@ cat results/mvp_daa_oracle/summary.json
 Compute:
 
 ```text
-oracle_gain = oracle_pair_switch - base_pair_switch
-rescue_fraction = oracle_gain / (1 - base_pair_switch)
+oracle_total_gain = Oracle-KV PairSwitchAcc - Base PairSwitchAcc
+oracle_kv_gain = Oracle-KV PairSwitchAcc - Oracle-Prompt-only PairSwitchAcc
+failure_rescue_fraction = oracle_total_gain / (1 - Base PairSwitchAcc)
 ```
 
-STOP the DAA/KV line if `oracle_gain < 0.05` OR `rescue_fraction < 0.15`.
-Do not run more complex routing to rescue a failed Oracle gate.
+Decision:
 
-## 6. Only if Oracle passes
+- if `oracle_total_gain < 0.05` OR `failure_rescue_fraction < 0.15`: STOP the whole DAA/focusing line;
+- if Oracle-Prompt rescues but `oracle_kv_gain < 0.03`: location prompting helps but the KV-mask claim is weak; do not build a paper around KV control;
+- if `oracle_kv_gain >= 0.03`: the runtime KV intervention has a plausible causal effect; proceed.
+
+## 6. Self-declared fixed-block controls
+
+Only run if the Oracle stage justifies continuing:
 
 ```bash
 bash scripts/run_daa.sh configs/experiment/mvp_daa_prompt_only.yaml
@@ -92,12 +107,12 @@ bash scripts/run_daa.sh configs/experiment/mvp_daa_fixed.yaml
 Compare:
 
 ```text
-Fixed DAA PairSwitchAcc - Prompt-only PairSwitchAcc
+self_kv_gain = Fixed-DAA PairSwitchAcc - Prompt-only PairSwitchAcc
 ```
 
-If gain < 0.03, the evidence for a causal KV contribution is weak.
+If `self_kv_gain < 0.03`, evidence for the self-declared KV intervention is weak.
 
-If Oracle passes but fixed DAA SelectionSwitchAcc < 0.50, run at most one 7B NF4 replication. If that also fails, stop the zero-shot selector.
+If Oracle-KV works but fixed DAA `SelectionSwitchAcc < 0.50`, run at most one Qwen2.5-Omni-7B NF4 replication. If 7B also fails, stop the zero-shot declarative selector.
 
 ## 7. Optional only after fixed DAA succeeds
 
@@ -132,8 +147,9 @@ capability target_only_acc
 event_only_acc
 eligible_pairs / total
 Base IgnoreAcc / UseAcc / SAR / PairSwitchAcc
-Oracle PairSwitchAcc / oracle_gain / rescue_fraction
-Prompt-only PairSwitchAcc (if run)
+Oracle-Prompt-only PairSwitchAcc
+Oracle-KV PairSwitchAcc / oracle_total_gain / oracle_kv_gain / rescue_fraction
+Self Prompt-only PairSwitchAcc (if run)
 Fixed DAA PairSwitchAcc / SelectionSwitchAcc / ignore_target_coverage_mean (if run)
 Declared DAA results (only if run)
 any OOM / protocol failure stages
