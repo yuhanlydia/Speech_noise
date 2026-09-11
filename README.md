@@ -26,11 +26,12 @@ It also used query wording that explicitly said `ignore` / `irrelevant`, which l
 
 **Do not use the old run to accept or reject the research hypothesis.**
 
-The current protocol is **Validity-Gated DAA V2**. It first proves that both component capabilities exist, then tests the mixed waveform, then asks whether perfect ground-truth KV focusing can causally rescue the failure.
+The current protocol is **Validity-Gated DAA V2**. It proves both component capabilities first, measures the mixed-audio gap second, then separates explicit location prompting from the causal effect of an actual audio-KV mask.
 
-Full protocol:
+Canonical execution instructions:
 
 ```text
+TASK_V2.md
 docs/VALIDITY_GATED_DAA_V2.md
 ```
 
@@ -46,15 +47,13 @@ The Speech LM is given an addressable acoustic context and explicitly declares w
 <focus_audio blocks="B2,B3">
 ```
 
-The runtime then masks unselected audio keys **before attention softmax** for the query/answer consumer tokens. Therefore the attention distribution is renormalized over the selected audio KV plus normal text/local context.
+The runtime can then mask unselected audio keys **before attention softmax** for query/answer consumer tokens. The attention distribution is therefore renormalized over the selected audio KV plus normal text/local context.
 
-The primary V2 condition uses **fixed temporal blocks**. This is deliberate: model-generated timestamp segmentation is a separate capability and must not be conflated with relevance selection.
-
-Model-declared semantic segmentation remains a secondary ablation.
+The primary V2 condition uses **fixed temporal blocks**. Model-generated timestamp segmentation is a separate capability and must not be conflated with relevance selection. Model-declared semantic segmentation remains a secondary ablation.
 
 ## QACR baseline
 
-The previous learned soft router remains in the repository:
+The previous learned soft router remains available:
 
 ```text
 r_j(q) = sigmoid((W_q e_q)^T (W_a h_j) / sqrt(d_r))
@@ -75,7 +74,7 @@ Thinker only
 eager attention
 ```
 
-The code is designed for a 16 GB A4000 and also runs on a 24 GB RTX 3090.
+The code is designed for a 16 GB A4000 and a 24 GB RTX 3090.
 
 Install:
 
@@ -92,15 +91,15 @@ python -m compileall src scripts
 
 # 3. Public V2 data
 
-Primary development dataset:
+Primary development data:
 
-- reasoning content: `cais/mmlu`, `validation`;
+- reasoning content: `cais/mmlu`, split `validation`;
 - target speech: local eSpeak-NG synthesis of the MMLU question and four choices;
 - acoustic event: `ashraq/esc50`, folds 1/2/3, restricted to distinctive classes;
-- confirmation data: MMLU `test` + ESC-50 folds 4/5;
+- confirmation: MMLU `test` + ESC-50 folds 4/5;
 - optional second-stage stress: LibriSpeech `validation.clean` / `test.clean`.
 
-The first mechanism test is time-separated:
+The first mechanism test is intentionally time-separated:
 
 ```text
 spoken MMLU -> short gap -> ESC-50 event
@@ -148,16 +147,6 @@ python scripts/prepare_public_mvp.py \
   --seed 0
 ```
 
-This creates:
-
-```text
-data/mvp/source.jsonl
-data/mvp/pairs.jsonl
-data/mvp/sources/target/*.wav
-data/mvp/sources/esc50/*.wav
-data/mvp/audio/*.wav
-```
-
 ## Step 1 — data audit
 
 ```bash
@@ -173,9 +162,7 @@ ok = true
 num_errors = 0
 ```
 
-The audit rereads the actual WAVs and checks sample rates, offsets, event spans, finite samples, use/ignore waveform identity, and recomputed SHA-256 hashes.
-
-If this fails, fix data before using a GPU result.
+The audit rereads the actual WAVs and verifies sample rates, offsets, event spans, finite samples, use/ignore waveform identity, and recomputed SHA-256 hashes.
 
 ## Step 2 — isolated capability gate
 
@@ -183,14 +170,14 @@ If this fails, fix data before using a GPU result.
 bash scripts/run_capability_gate.sh
 ```
 
-Each pair is tested on:
+Each pair is first tested on:
 
 ```text
 target WAV only + target/MMLU query
 event WAV only  + event query
 ```
 
-A pair is retained only when both answers are correct:
+A pair is retained only when both are correct:
 
 ```text
 eligible = target_only_correct AND event_only_correct
@@ -209,7 +196,7 @@ Decision:
 - `32–63`: exploratory only;
 - `>=64`: proceed.
 
-All later configs read `pairs_eligible.jsonl`.
+All later configs use `pairs_eligible.jsonl`.
 
 ## Step 3 — mixed Base
 
@@ -217,14 +204,14 @@ All later configs read `pairs_eligible.jsonl`.
 bash scripts/run_diagnostic.sh
 ```
 
-Metrics:
+Primary metrics:
 
 - `IgnoreAcc`
 - `UseAcc`
 - `SAR`
 - `PairSwitchAcc`
 
-Stop the whole project when the eligible mixed Base is already strong:
+Stop the whole project if:
 
 ```text
 PairSwitchAcc >= 0.80
@@ -232,51 +219,65 @@ AND
 PairSwitchAcc >= min(IgnoreAcc, UseAcc) - 0.05
 ```
 
-Then there is no large relevance-switch failure worth solving.
+Then there is no practically large relevance-switch gap to solve.
 
-## Step 4 — Oracle-KV rescue: decisive mechanism gate
+## Step 4 — oracle location controls
+
+These are mandatory before spending time on self-declared selection.
+
+### 4A. Oracle-Prompt-only
+
+```bash
+bash scripts/run_daa.sh configs/experiment/mvp_daa_oracle_prompt_only.yaml
+```
+
+Ground-truth target/event temporal regions are shown in the address table and focus declaration, but **no KV mask is applied**.
+
+This measures whether merely telling the model where the relevant evidence is located helps.
+
+### 4B. Oracle-KV
 
 ```bash
 bash scripts/run_daa.sh configs/experiment/mvp_daa_oracle.yaml
 ```
 
-Oracle uses the known generated temporal regions:
-
-```text
-ignore query -> pre-event target region
-use query    -> exact event region
-```
+The prompt/address information is matched to 4A, but now the runtime also masks unselected audio KV before softmax.
 
 Define:
 
 ```text
-oracle_gain = Oracle PairSwitchAcc - Base PairSwitchAcc
-failure_rescue_fraction = oracle_gain / (1 - Base PairSwitchAcc)
+oracle_total_gain = Oracle-KV PairSwitchAcc - Base PairSwitchAcc
+oracle_kv_gain = Oracle-KV PairSwitchAcc - Oracle-Prompt-only PairSwitchAcc
+failure_rescue_fraction = oracle_total_gain / (1 - Base PairSwitchAcc)
 ```
 
-**Stop the DAA/KV-routing line** if:
+Decision:
 
 ```text
-oracle_gain < 0.05
-OR
-failure_rescue_fraction < 0.15
+oracle_total_gain < 0.05
+OR failure_rescue_fraction < 0.15
+    -> STOP the DAA/focusing line
+
+Oracle-Prompt helps but oracle_kv_gain < 0.03
+    -> location prompting helps, but the KV-control claim is weak
+
+oracle_kv_gain >= 0.03
+    -> actual KV masking has a plausible causal contribution
 ```
 
-If perfect focus cannot help, selector training or better segmentation is not the answer.
+## Step 5 — self-declared fixed-block controls
 
-## Step 5 — Prompt-only control
+Only run if the oracle stage justifies continuing.
 
-Only run if Oracle passes:
+### 5A. Self Prompt-only
 
 ```bash
 bash scripts/run_daa.sh configs/experiment/mvp_daa_prompt_only.yaml
 ```
 
-The model emits/receives the same focus declaration but the runtime does **not** mask KV.
+The model declares fixed block IDs; the final prompt contains the same address table and focus tag, but no KV mask.
 
-This isolates gains caused by explicit focus prompting from gains caused by the actual attention intervention.
-
-## Step 6 — self-declared fixed-block DAA
+### 5B. Fixed DAA with KV mask
 
 ```bash
 bash scripts/run_daa.sh configs/experiment/mvp_daa_fixed.yaml
@@ -289,60 +290,62 @@ use: event midpoint is inside a selected block
 ignore: event is avoided AND >=80% of the pre-event target region is retained
 ```
 
-The KV intervention is not compelling if:
+Define:
 
 ```text
-Fixed-DAA PairSwitchAcc - Prompt-only PairSwitchAcc < 0.03
+self_kv_gain = Fixed-DAA PairSwitchAcc - Self-Prompt-only PairSwitchAcc
 ```
 
-If Oracle works but zero-shot `SelectionSwitchAcc < 0.50`, one Qwen2.5-Omni-7B NF4 replication is reasonable. If 7B also fails, stop the zero-shot declarative selector.
+If `self_kv_gain < 0.03`, the self-declared KV intervention is not a strong method claim.
 
-## Step 7 — declared segmentation ablation
+If Oracle-KV works but zero-shot `SelectionSwitchAcc < 0.50`, run at most one Qwen2.5-Omni-7B NF4 replication. If 7B also fails, stop the zero-shot declarative selector.
 
-Only after fixed DAA:
+## Step 6 — declared segmentation ablation
+
+Only after fixed DAA succeeds:
 
 ```bash
 bash scripts/run_daa.sh configs/experiment/mvp_daa_declared.yaml
 ```
 
-Failure here means semantic/timestamp declaration is unreliable. It does not by itself refute fixed-address DAA.
+Failure here means semantic/timestamp declaration is unreliable. It does not refute fixed-address DAA.
 
 ---
 
 # 5. Causal comparison table
 
-The V2 paper claim must be supported by all of these conditions:
-
 | Condition | Focus source | KV mask | Purpose |
 |---|---|---:|---|
-| Base | none | no | mixed relevance-switch gap |
-| Oracle-KV | ground truth | yes | causal upper bound / line-kill test |
-| Prompt-only | model | no | explicit-reasoning control |
-| Fixed DAA | model | yes | primary zero-shot method |
-| Declared DAA | model + model segmentation | yes | harder segmentation ablation |
+| Base | none | no | establish eligible mixed gap |
+| Oracle-Prompt | ground truth | no | explicit-location upper bound |
+| Oracle-KV | ground truth | yes | causal KV-mask upper bound |
+| Self Prompt-only | model | no | explicit self-selection control |
+| Fixed DAA | model | yes | primary zero-shot DAA |
+| Declared DAA | model + model segmentation | yes | segmentation ablation |
 
-The critical comparisons are:
+Critical differences:
 
 ```text
-Base -> Oracle-KV
-Prompt-only -> Fixed DAA
+Base -> Oracle-Prompt       : does knowing where to listen help?
+Oracle-Prompt -> Oracle-KV  : does KV masking itself help?
+Self Prompt -> Fixed DAA    : does self-declared KV control help?
 ```
 
 ---
 
 # 6. Make results visible on GitHub
 
-`results/` and generated audio are intentionally ignored. After the experiment:
+Generated audio and `results/` are intentionally ignored. After running:
 
 ```bash
 python scripts/export_run_v2.py
 
 git add reports/run_v2
 git commit -m "results: add validity-gated DAA V2 run"
-git push
+git push origin feature/daa-mvp
 ```
 
-Then the actual metrics are available under:
+Then the actual metrics are visible under:
 
 ```text
 reports/run_v2/summary.json
@@ -351,31 +354,34 @@ reports/run_v2/SUMMARY.md
 
 ---
 
-# 7. Research stopping rule
+# 7. Stop rules
 
 We do **not** keep adding modules until something works.
 
 ```text
-Data invalid
-  -> fix data
+Data audit fails
+  -> FIX DATA
 
 Insufficient isolated capability
-  -> invalid benchmark/backbone pairing
+  -> INVALID BENCHMARK/BACKBONE PAIRING
 
-No mixed gap among eligible pairs
+Eligible Base has no mixed pairwise gap
   -> STOP PROJECT
 
-Gap exists but Oracle-KV cannot rescue
-  -> STOP DAA / KV-routing line
+Gap exists but Oracle focus does not rescue
+  -> STOP DAA / FOCUSING LINE
 
-Oracle rescues but Fixed DAA ~= Prompt-only
-  -> explicit prompt effect, weak KV-method claim
+Oracle-Prompt rescues but Oracle-KV adds <3pp
+  -> explicit localization effect; weak KV claim
 
-Oracle rescues and Fixed DAA > Prompt-only with correct relevance reversal
+Oracle-KV works but self selector fails on 3B and one 7B check
+  -> STOP ZERO-SHOT DAA SELECTOR
+
+Oracle-KV and self-declared KV both beat their prompt-only controls
   -> CONTINUE; strong mechanism candidate
 ```
 
-Only after this sequence passes should the project move to partial overlap, competing human speech, multiple backbones, and external speech/audio benchmarks.
+Only after V2 passes should the project move to partial overlap, competing human speech, multiple backbones, and external speech/audio benchmarks.
 
 ---
 
@@ -386,11 +392,11 @@ src/sar/data/public_mvp.py      public data construction
 src/sar/data/audit.py           waveform / metadata integrity audit
 src/sar/validity.py             isolated capability eligibility gate
 src/sar/validity_smoke.py       capability GPU launcher
-src/sar/data/blocks.py          acoustic block address space
-src/sar/methods/daa.py          focus protocol and attention semantics
+src/sar/data/blocks.py          acoustic address space
+src/sar/methods/daa.py          focus protocol / attention semantics
 src/sar/models/daa_hook.py      pre-softmax Qwen audio-KV masking
-src/sar/models/qwen_omni_daa.py Base / prompt-only / masked DAA wrapper
-src/sar/daa_pipeline.py         oracle/model focus + selection metrics
+src/sar/models/qwen_omni_daa.py prompt-only + masked DAA wrapper
+src/sar/daa_pipeline.py         oracle/model focus + validity metrics
 src/sar/daa_smoke.py            DAA evaluator
 src/sar/report.py               tracked V2 report export
 scripts/prepare_public_mvp.py
