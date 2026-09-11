@@ -16,7 +16,7 @@ The key claim is not generic query-conditioned audio selection. The falsifiable 
 Prompts changed in V2. Delete any old generated MVP before running:
 
 ```bash
-rm -rf data/mvp results/mvp_* results/data_audit reports/run_v2
+rm -rf data/mvp results/mvp_* results/data_audit results/daa_identity reports/run_v2
 python scripts/prepare_public_mvp.py \
   --output-dir data/mvp \
   --num-pairs 128 \
@@ -68,6 +68,24 @@ Decision:
 - `<32` eligible pairs out of 128: **invalid setup**. Do not interpret relevance switching.
 - `32–63`: diagnostic only.
 - `>=64`: proceed.
+
+## Gate 1.5 — Real-Qwen hook identity sanity
+
+Before interpreting any DAA/KV result, verify the custom Qwen attention hook is an identity when all audio remains allowed:
+
+```bash
+python scripts/check_daa_identity.py
+```
+
+The exact same focus prompt is scored twice: once without the hook and once with the hook while a single full-audio block is allowed. Required:
+
+```text
+ok = true
+predictions_match = true
+max_abs_logprob_diff <= 1e-4
+```
+
+If this fails, stop and treat the run as a code / Transformers integration failure, not a scientific result.
 
 ## Gate 2 — Does a relevance-switch gap actually exist?
 
@@ -215,6 +233,9 @@ Data audit fails
 
 Capability eligible < 32
   -> INVALID SETUP; DO NOT CLAIM GAP
+
+Hook identity fails
+  -> CODE / TRANSFORMERS INTEGRATION ERROR
 
 Eligible Base has no pairwise gap
   -> STOP PROJECT
