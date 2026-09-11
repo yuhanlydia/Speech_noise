@@ -7,6 +7,7 @@ from pathlib import Path
 STAGES = {
     "capability": "mvp_capability_gate",
     "base": "mvp_diagnostic",
+    "oracle_prompt_only": "mvp_daa_oracle_prompt_only",
     "oracle_kv": "mvp_daa_oracle",
     "prompt_only": "mvp_daa_prompt_only",
     "fixed_daa": "mvp_daa_fixed",
@@ -38,7 +39,11 @@ def export_v2_report(
     for key in STAGES:
         md.append(f"## {key}")
         payload = stages[key]
-        md.append("not run" if payload is None else "```json\n" + json.dumps(payload, indent=2) + "\n```")
+        md.append(
+            "not run"
+            if payload is None
+            else "```json\n" + json.dumps(payload, indent=2) + "\n```"
+        )
         md.append("")
     (output_dir / "SUMMARY.md").write_text("\n".join(md), encoding="utf-8")
     return report
