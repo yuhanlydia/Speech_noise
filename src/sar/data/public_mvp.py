@@ -8,7 +8,7 @@ import subprocess
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Sequence
 
 import numpy as np
 import soundfile as sf
@@ -16,8 +16,7 @@ import soundfile as sf
 
 LETTERS = ("A", "B", "C", "D")
 
-# Deliberately restrict the first controlled experiment to acoustically distinctive
-# ESC-50 classes. Broader classes can be added after the mechanism gate passes.
+# Restrict the first controlled experiment to acoustically distinctive classes.
 ESC50_MVP_CATEGORIES = (
     "dog",
     "rooster",
@@ -93,25 +92,36 @@ def format_mmlu_spoken_prompt(question: str, choices: Sequence[str]) -> str:
     if len(choices) != 4:
         raise ValueError("MMLU MVP requires exactly four choices")
     pieces = [f"Question. {question.strip()}", "Choices."]
-    pieces.extend(f"{letter}. {str(choice).strip()}" for letter, choice in zip(LETTERS, choices))
+    pieces.extend(
+        f"{letter}. {str(choice).strip()}"
+        for letter, choice in zip(LETTERS, choices)
+    )
     return " ".join(pieces)
 
 
 def ignore_query() -> str:
+    # Deliberately do not say "ignore", "irrelevant", or "background". The query
+    # itself must define relevance; otherwise the benchmark leaks its own label.
     return (
-        "Listen to the spoken multiple-choice question. Which option correctly answers "
-        "that question? Answer with A, B, C, or D only. The later background event is "
-        "irrelevant to this question."
+        "Which option correctly answers the spoken multiple-choice question? "
+        "Answer with A, B, C, or D only."
     )
 
 
-def _choice_query(stem: str, semantic_choices: Sequence[str], correct_index: int) -> tuple[str, str]:
+def _choice_query(
+    stem: str, semantic_choices: Sequence[str], correct_index: int
+) -> tuple[str, str]:
     if len(semantic_choices) != 4 or not 0 <= correct_index < 4:
-        raise ValueError("semantic multiple choice requires four choices and a valid correct index")
+        raise ValueError(
+            "semantic multiple choice requires four choices and a valid correct index"
+        )
     rendered = " ".join(
         f"{letter}. {choice}" for letter, choice in zip(LETTERS, semantic_choices)
     )
-    return f"{stem} {rendered} Answer with A, B, C, or D only.", LETTERS[correct_index]
+    return (
+        f"{stem} {rendered} Answer with A, B, C, or D only.",
+        LETTERS[correct_index],
+    )
 
 
 def esc50_use_query(category: str, *, rng: random.Random) -> tuple[str, str]:
@@ -122,7 +132,7 @@ def esc50_use_query(category: str, *, rng: random.Random) -> tuple[str, str]:
     rng.shuffle(picked)
     choices = [DISPLAY_EVENT[c] for c in picked]
     return _choice_query(
-        "Ignoring the spoken exam question, which background sound occurs after it?",
+        "Which of the following sounds can be heard in the recording?",
         choices,
         picked.index(category),
     )
@@ -134,19 +144,25 @@ def librispeech_use_query(
     *,
     rng: random.Random,
 ) -> tuple[str, str]:
-    pool = [str(x).strip() for x in distractor_transcripts if str(x).strip() and str(x).strip() != transcript.strip()]
+    pool = [
+        str(x).strip()
+        for x in distractor_transcripts
+        if str(x).strip() and str(x).strip() != transcript.strip()
+    ]
     if len(pool) < 3:
         raise ValueError("need at least three distinct LibriSpeech distractor transcripts")
     choices = rng.sample(pool, 3) + [transcript.strip()]
     rng.shuffle(choices)
     return _choice_query(
-        "Ignoring the spoken exam question, which phrase is spoken afterward by the background speaker?",
+        "Which of the following phrases can be heard in the recording?",
         choices,
         choices.index(transcript.strip()),
     )
 
 
-def resample_linear(waveform: np.ndarray, orig_sr: int, target_sr: int) -> np.ndarray:
+def resample_linear(
+    waveform: np.ndarray, orig_sr: int, target_sr: int
+) -> np.ndarray:
     x = np.asarray(waveform, dtype=np.float32)
     if x.ndim != 1:
         raise ValueError("public MVP expects mono audio")
@@ -155,8 +171,12 @@ def resample_linear(waveform: np.ndarray, orig_sr: int, target_sr: int) -> np.nd
     if orig_sr == target_sr or x.size == 0:
         return x.astype(np.float32, copy=True)
     new_len = max(1, int(round(x.size * float(target_sr) / float(orig_sr))))
-    old_pos = np.linspace(0.0, 1.0, num=x.size, endpoint=False, dtype=np.float64)
-    new_pos = np.linspace(0.0, 1.0, num=new_len, endpoint=False, dtype=np.float64)
+    old_pos = np.linspace(
+        0.0, 1.0, num=x.size, endpoint=False, dtype=np.float64
+    )
+    new_pos = np.linspace(
+        0.0, 1.0, num=new_len, endpoint=False, dtype=np.float64
+    )
     return np.interp(new_pos, old_pos, x).astype(np.float32)
 
 
@@ -199,7 +219,16 @@ def synthesize_espeak(
     with tempfile.TemporaryDirectory() as tmp:
         raw_wav = Path(tmp) / "tts.wav"
         subprocess.run(
-            [exe, "-v", voice, "-s", str(int(speed)), "-w", str(raw_wav), text],
+            [
+                exe,
+                "-v",
+                voice,
+                "-s",
+                str(int(speed)),
+                "-w",
+                str(raw_wav),
+                text,
+            ],
             check=True,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
@@ -208,7 +237,9 @@ def synthesize_espeak(
         audio, sr = sf.read(raw_wav, dtype="float32")
     if audio.ndim == 2:
         audio = audio.mean(axis=1)
-    audio = resample_linear(np.asarray(audio, dtype=np.float32), int(sr), sample_rate)
+    audio = resample_linear(
+        np.asarray(audio, dtype=np.float32), int(sr), sample_rate
+    )
     sf.write(output_wav, audio, sample_rate, subtype="PCM_16")
     return output_wav
 
@@ -227,7 +258,9 @@ def _load_datasets_api():
     return Audio, load_dataset
 
 
-def load_mmlu_rows(*, protocol: str, num_pairs: int, seed: int, max_spoken_words: int) -> list[dict]:
+def load_mmlu_rows(
+    *, protocol: str, num_pairs: int, seed: int, max_spoken_words: int
+) -> list[dict]:
     _, load_dataset = _load_datasets_api()
     spec = protocol_spec(protocol)
     ds = load_dataset("cais/mmlu", "all", split=spec.mmlu_split)
@@ -239,8 +272,8 @@ def load_mmlu_rows(*, protocol: str, num_pairs: int, seed: int, max_spoken_words
     ]
     if len(candidates) < num_pairs:
         raise ValueError(
-            f"only {len(candidates)} MMLU rows satisfy max_spoken_words={max_spoken_words}; "
-            f"requested {num_pairs}"
+            f"only {len(candidates)} MMLU rows satisfy "
+            f"max_spoken_words={max_spoken_words}; requested {num_pairs}"
         )
     rng = random.Random(seed)
     rng.shuffle(candidates)
@@ -255,19 +288,26 @@ def load_esc50_rows(*, protocol: str, num_pairs: int, seed: int) -> list[dict]:
     candidates = [
         dict(row)
         for row in ds
-        if int(row["fold"]) in spec.esc50_folds and str(row["category"]) in ESC50_MVP_CATEGORIES
+        if int(row["fold"]) in spec.esc50_folds
+        and str(row["category"]) in ESC50_MVP_CATEGORIES
     ]
     if len(candidates) < num_pairs:
-        raise ValueError(f"only {len(candidates)} eligible ESC-50 rows; requested {num_pairs}")
+        raise ValueError(
+            f"only {len(candidates)} eligible ESC-50 rows; requested {num_pairs}"
+        )
     rng = random.Random(seed + 17)
     rng.shuffle(candidates)
     return candidates[:num_pairs]
 
 
-def load_librispeech_rows(*, protocol: str, num_pairs: int, seed: int) -> list[dict]:
+def load_librispeech_rows(
+    *, protocol: str, num_pairs: int, seed: int
+) -> list[dict]:
     Audio, load_dataset = _load_datasets_api()
     spec = protocol_spec(protocol)
-    ds = load_dataset("openslr/librispeech_asr", "all", split=spec.librispeech_split)
+    ds = load_dataset(
+        "openslr/librispeech_asr", "all", split=spec.librispeech_split
+    )
     ds = ds.cast_column("audio", Audio(decode=False))
     candidates = []
     for row in ds:
@@ -275,7 +315,9 @@ def load_librispeech_rows(*, protocol: str, num_pairs: int, seed: int) -> list[d
         if 2 <= len(words) <= 10:
             candidates.append(dict(row))
     if len(candidates) < num_pairs + 3:
-        raise ValueError(f"only {len(candidates)} eligible LibriSpeech rows; requested {num_pairs}")
+        raise ValueError(
+            f"only {len(candidates)} eligible LibriSpeech rows; requested {num_pairs}"
+        )
     rng = random.Random(seed + 29)
     rng.shuffle(candidates)
     return candidates[: max(num_pairs + 3, 8)]
@@ -321,9 +363,13 @@ def prepare_source_manifest(
         max_spoken_words=max_spoken_words,
     )
     if event_source == "esc50":
-        event_rows = load_esc50_rows(protocol=protocol, num_pairs=num_pairs, seed=seed)
+        event_rows = load_esc50_rows(
+            protocol=protocol, num_pairs=num_pairs, seed=seed
+        )
     else:
-        event_rows = load_librispeech_rows(protocol=protocol, num_pairs=num_pairs, seed=seed)
+        event_rows = load_librispeech_rows(
+            protocol=protocol, num_pairs=num_pairs, seed=seed
+        )
 
     rng = random.Random(seed)
     source_manifest = output_dir / "source.jsonl"
@@ -331,7 +377,9 @@ def prepare_source_manifest(
         for idx, mmlu in enumerate(mmlu_rows):
             pair_id = f"{protocol}-{event_source}-{idx:04d}"
             target_path = target_dir / f"{pair_id}.wav"
-            spoken = format_mmlu_spoken_prompt(str(mmlu["question"]), list(mmlu["choices"]))
+            spoken = format_mmlu_spoken_prompt(
+                str(mmlu["question"]), list(mmlu["choices"])
+            )
             synthesize_espeak(
                 spoken,
                 target_path,
@@ -350,17 +398,27 @@ def prepare_source_manifest(
             _write_audio(event_path, event_audio, sample_rate)
 
             if event_source == "esc50":
-                use_q, use_a = esc50_use_query(str(event_row["category"]), rng=rng)
+                use_q, use_a = esc50_use_query(
+                    str(event_row["category"]), rng=rng
+                )
                 event_type = str(event_row["category"])
                 source_id = str(event_row.get("filename", pair_id))
             else:
-                other_text = [str(r["text"]) for j, r in enumerate(event_rows) if j != idx]
-                use_q, use_a = librispeech_use_query(str(event_row["text"]), other_text, rng=rng)
+                other_text = [
+                    str(r["text"])
+                    for j, r in enumerate(event_rows)
+                    if j != idx
+                ]
+                use_q, use_a = librispeech_use_query(
+                    str(event_row["text"]), other_text, rng=rng
+                )
                 event_type = "background_speech"
                 source_id = str(event_row.get("id", pair_id))
 
             answer_idx = int(mmlu["answer"])
-            offset_samples = int(len(target_audio) + round(gap_s * sample_rate))
+            offset_samples = int(
+                len(target_audio) + round(gap_s * sample_rate)
+            )
             row = {
                 "pair_id": pair_id,
                 "target_wav": str(target_path.resolve()),
@@ -383,6 +441,7 @@ def prepare_source_manifest(
                 row["tir_db"] = float(ratio_db)
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
+    spec = protocol_spec(protocol)
     metadata = {
         "protocol": protocol,
         "event_source": event_source,
@@ -392,13 +451,30 @@ def prepare_source_manifest(
         "gap_s": gap_s,
         "ratio_db": ratio_db,
         "max_spoken_words": max_spoken_words,
-        "target_questions": {"dataset": "cais/mmlu", "config": "all", "split": protocol_spec(protocol).mmlu_split},
+        "target_questions": {
+            "dataset": "cais/mmlu",
+            "config": "all",
+            "split": spec.mmlu_split,
+        },
         "event_dataset": (
-            {"dataset": "ashraq/esc50", "split": "train", "folds": list(protocol_spec(protocol).esc50_folds)}
+            {
+                "dataset": "ashraq/esc50",
+                "split": "train",
+                "folds": list(spec.esc50_folds),
+            }
             if event_source == "esc50"
-            else {"dataset": "openslr/librispeech_asr", "config": "all", "split": protocol_spec(protocol).librispeech_split}
+            else {
+                "dataset": "openslr/librispeech_asr",
+                "config": "all",
+                "split": spec.librispeech_split,
+            }
         ),
-        "tts": {"engine": "espeak-ng", "voice": tts_voice, "speed": tts_speed},
+        "tts": {
+            "engine": "espeak-ng",
+            "voice": tts_voice,
+            "speed": tts_speed,
+        },
+        "prompt_policy": "query defines relevance; no ignore/irrelevant label leakage",
     }
     (output_dir / "public_mvp_metadata.json").write_text(
         json.dumps(metadata, indent=2) + "\n", encoding="utf-8"
