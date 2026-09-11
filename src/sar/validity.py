@@ -22,7 +22,9 @@ def load_source_rows(path: str | Path) -> dict[str, dict]:
             if pair_id in out:
                 raise ValueError(f"duplicate pair_id in source manifest: {pair_id}")
             if not row.get("target_wav") or not row.get("event_wav"):
-                raise ValueError(f"{pair_id}: source row requires target_wav and event_wav")
+                raise ValueError(
+                    f"{pair_id}: source row requires target_wav and event_wav"
+                )
             out[pair_id] = row
     return out
 
@@ -30,10 +32,13 @@ def load_source_rows(path: str | Path) -> dict[str, dict]:
 def _score(wrapper, audio_path: str, record) -> OptionScores:
     if not record.options:
         raise ValueError(f"{record.pair_id}/{record.role}: options are required")
-    try:
-        return wrapper.score_single_token_options(audio_path, record.query, record.options)
-    except (AttributeError, ValueError):
-        return wrapper.score_options(audio_path, record.query, record.options)
+    # The public V2 protocol deliberately uses canonical A/B/C/D options. If the
+    # canonical scorer exists but fails, propagate that failure instead of hiding a
+    # tokenizer/model integration bug behind a slower scoring fallback.
+    scorer = getattr(wrapper, "score_single_token_options", None)
+    if scorer is not None:
+        return scorer(audio_path, record.query, record.options)
+    return wrapper.score_options(audio_path, record.query, record.options)
 
 
 def evaluate_capability_pairs(
@@ -85,7 +90,11 @@ def evaluate_capability_pairs(
 def filter_eligible_records(
     records: Sequence[RelevancePairRecord], capability_rows: Sequence[dict]
 ) -> list[RelevancePairRecord]:
-    eligible = {str(row["pair_id"]) for row in capability_rows if bool(row["eligible"])}
+    eligible = {
+        str(row["pair_id"])
+        for row in capability_rows
+        if bool(row["eligible"])
+    }
     return [record for record in records if record.pair_id in eligible]
 
 
