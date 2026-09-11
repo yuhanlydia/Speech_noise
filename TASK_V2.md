@@ -17,7 +17,7 @@ pytest -q
 ## 1. Rebuild V2 data
 
 ```bash
-rm -rf data/mvp results/mvp_* results/data_audit reports/run_v2
+rm -rf data/mvp results/mvp_* results/data_audit results/daa_identity reports/run_v2
 python scripts/prepare_public_mvp.py \
   --output-dir data/mvp \
   --num-pairs 128 \
@@ -51,7 +51,26 @@ Decision:
 - eligible 32–63: exploratory only.
 - eligible >= 64: proceed.
 
-## 4. Mixed Base on eligible pairs
+## 4. Real-Qwen DAA hook identity sanity
+
+Before interpreting any masked result, verify the custom attention hook is an identity when every audio token remains allowed:
+
+```bash
+python scripts/check_daa_identity.py
+cat results/daa_identity/summary.json
+```
+
+Required:
+
+```text
+ok = true
+predictions_match = true
+max_abs_logprob_diff <= 1e-4
+```
+
+If this fails, STOP. Treat it as a code / Transformers-integration problem, not a research result.
+
+## 5. Mixed Base on eligible pairs
 
 ```bash
 bash scripts/run_diagnostic.sh
@@ -65,7 +84,7 @@ PairSwitchAcc >= 0.80
 AND PairSwitchAcc >= min(IgnoreAcc, UseAcc) - 0.05
 ```
 
-## 5. Oracle location controls — mandatory before self-declared DAA
+## 6. Oracle location controls — mandatory before self-declared DAA
 
 First test whether simply telling the model the ground-truth acoustic region helps, without modifying KV:
 
@@ -95,7 +114,7 @@ Decision:
 - if Oracle-Prompt rescues but `oracle_kv_gain < 0.03`: location prompting helps but the KV-mask claim is weak; do not build a paper around KV control;
 - if `oracle_kv_gain >= 0.03`: the runtime KV intervention has a plausible causal effect; proceed.
 
-## 6. Self-declared fixed-block controls
+## 7. Self-declared fixed-block controls
 
 Only run if the Oracle stage justifies continuing:
 
@@ -114,7 +133,7 @@ If `self_kv_gain < 0.03`, evidence for the self-declared KV intervention is weak
 
 If Oracle-KV works but fixed DAA `SelectionSwitchAcc < 0.50`, run at most one Qwen2.5-Omni-7B NF4 replication. If 7B also fails, stop the zero-shot declarative selector.
 
-## 7. Optional only after fixed DAA succeeds
+## 8. Optional only after fixed DAA succeeds
 
 ```bash
 bash scripts/run_daa.sh configs/experiment/mvp_daa_declared.yaml
@@ -122,7 +141,7 @@ bash scripts/run_daa.sh configs/experiment/mvp_daa_declared.yaml
 
 This is a segmentation ablation, not the primary method.
 
-## 8. Export results so ChatGPT can inspect them
+## 9. Export results so ChatGPT can inspect them
 
 ```bash
 python scripts/export_run_v2.py
@@ -146,6 +165,7 @@ data audit ok/errors
 capability target_only_acc
 event_only_acc
 eligible_pairs / total
+hook identity ok / max_abs_logprob_diff
 Base IgnoreAcc / UseAcc / SAR / PairSwitchAcc
 Oracle-Prompt-only PairSwitchAcc
 Oracle-KV PairSwitchAcc / oracle_total_gain / oracle_kv_gain / rescue_fraction
