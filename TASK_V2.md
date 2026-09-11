@@ -1,6 +1,6 @@
 # TASK V2 — RTX 3090 Decisive Run
 
-Use branch `feature/daa-mvp`. Do not reuse old generated data or old result summaries.
+This is the **final justified validation round** for the current DAA/focusing direction. Do not add new routing modules to rescue a failed gate. Use branch `feature/daa-mvp`. Do not reuse old generated data or old result summaries.
 
 ## 0. Sync and install
 
@@ -110,8 +110,8 @@ failure_rescue_fraction = oracle_total_gain / (1 - Base PairSwitchAcc)
 
 Decision:
 
-- if `oracle_total_gain < 0.05` OR `failure_rescue_fraction < 0.15`: STOP the whole DAA/focusing line;
-- if Oracle-Prompt rescues but `oracle_kv_gain < 0.03`: location prompting helps but the KV-mask claim is weak; do not build a paper around KV control;
+- if `oracle_total_gain < 0.05` OR `failure_rescue_fraction < 0.15`: **STOP the whole DAA/focusing line**;
+- if Oracle-Prompt rescues but `oracle_kv_gain < 0.03`: location prompting helps but the KV-mask claim is weak; **do not build a paper around KV control**;
 - if `oracle_kv_gain >= 0.03`: the runtime KV intervention has a plausible causal effect; proceed.
 
 ## 7. Self-declared fixed-block controls
@@ -131,7 +131,7 @@ self_kv_gain = Fixed-DAA PairSwitchAcc - Prompt-only PairSwitchAcc
 
 If `self_kv_gain < 0.03`, evidence for the self-declared KV intervention is weak.
 
-If Oracle-KV works but fixed DAA `SelectionSwitchAcc < 0.50`, run at most one Qwen2.5-Omni-7B NF4 replication. If 7B also fails, stop the zero-shot declarative selector.
+If Oracle-KV works but fixed DAA `SelectionSwitchAcc < 0.50`, run at most one Qwen2.5-Omni-7B NF4 replication. If 7B also fails, **STOP the zero-shot declarative selector**.
 
 ## 8. Optional only after fixed DAA succeeds
 
