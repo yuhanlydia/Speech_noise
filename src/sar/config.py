@@ -25,10 +25,16 @@ class DataConfig(StrictModel):
 
 
 class DAAConfig(StrictModel):
-    block_strategy: Literal["declared", "fixed"] = "declared"
+    # Fixed address blocks are the primary test. Model-declared segmentation is a
+    # secondary ablation because segmentation failure must not be conflated with
+    # declarative relevance-selection failure.
+    block_strategy: Literal["declared", "fixed"] = "fixed"
+    focus_source: Literal["model", "oracle"] = "model"
+    apply_kv_mask: bool = True
     block_seconds: float = Field(default=1.5, gt=0)
     max_blocks: int = Field(default=8, ge=1)
-    max_focus_blocks: int = Field(default=2, ge=1)
+    max_focus_blocks: int = Field(default=8, ge=1)
+    min_target_coverage: float = Field(default=0.8, ge=0.0, le=1.0)
     scan_max_new_tokens: int = Field(default=192, ge=8)
     select_max_new_tokens: int = Field(default=48, ge=4)
     answer_max_new_tokens: int = Field(default=64, ge=4)
