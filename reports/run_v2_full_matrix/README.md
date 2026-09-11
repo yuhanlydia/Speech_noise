@@ -1,35 +1,26 @@
-# Full DAA V2 matrix — execution in progress
+# Full DAA V2 matrix — 3B complete, 7B in progress
 
-Performance-based stopping gates have been disabled under the user's explicit
-instruction. This report directory is an active full-matrix run, not a claim
-that every stage has finished. Historical gate-stopped reports are preserved.
+Progress snapshot: 2026-09-11T05:23:06.579804+00:00. Implementation commit: `59c47be`.
 
-Completed 3B results on the same 238 eligible pairs from 480 audited dev pairs:
+The user explicitly removed all performance-based stopping gates. Every condition is being evaluated regardless of accuracy, gain, rescue fraction, or selection quality. This is a progress report, not a claim that the entire matrix has finished.
 
-| Condition | PairSwitchAcc |
-|---|---:|
-| Mixed Base (verified reuse) | 89.50% |
-| Oracle Prompt-only | 82.35% |
-| Oracle KV | 79.41% |
-| Self Prompt-only | 76.05% |
-| Self Fixed DAA | 8.40% |
+The same audited 480 dev pairs yield 238 eligible 3B pairs and 271 eligible 7B pairs. The 7B run uses BF16 after the numerical repair described below.
 
-The independent Self controls produced identical declarations on all 476 rows;
-24 fresh replay predictions matched the independently evaluated Fixed DAA run.
-Both Self controls had zero runtime/protocol failures. SelectionSwitchAcc was
-0%; mean retained target coverage was 17.20%. These outcomes do not stop the
-remaining experiments.
+| Condition | 3B PairSwitchAcc | 7B PairSwitchAcc |
+|---|---:|---:|
+| Mixed Base | 89.50% | 92.25% |
+| Oracle Prompt-only | 82.35% | 87.08% |
+| Oracle KV | 79.41% | pending |
+| Self Prompt-only | 76.05% | pending |
+| Self Fixed DAA | 8.40% | pending |
+| Declared segmentation | 0.00% (declarations failed) | pending |
 
-3B model-declared segmentation is running. The 7B capability, identity, Base,
-Oracle controls, Self controls, and segmentation ablation are queued. Final
-exports, shared-eligible comparisons, paired rescue/harm counts, and complete
-hardware accounting will replace this progress snapshot after all stages finish.
+The 3B segmentation ablation attempted all 238 pairs: 202 lacked a complete block tag and 36 contained invalid block lines. No pair reached its answer pass. Both 3B Self fixed-block controls completed without protocol failures, with identical declarations on all 476 rows, SelectionSwitchAcc 0%, and mean retained target coverage 17.20%.
 
-Validation: 131 tests passed; declaration stopping preserved 24 real 3B focus
-prefixes/selections and 4 real scan parse outcomes. See PROTOCOL.md for the
-reproducible config paths, decoder optimization, declaration replay, and scope.
+On the 184 pairs eligible for both models, Base succeeds on 170/184 for 3B and 172/184 for 7B. Final paired rescue/harm counts and all-condition shared-cohort comparisons will be added after 7B finishes. Do not compare different eligible cohorts as a pure model-size effect.
 
-7B update: the first FP16 identity check exposed non-finite reference scores.
-That attempt and its 179-pair cohort are invalid and archived. BF16 passed the
-same real-model probe; the capability cohort and all 7B stages will be rebuilt.
-See NUMERICAL_FIX.md. The full experiment matrix remains in progress.
+Numerical validation: all 960 isolated 3B score vectors and 1,904 recomputed DAA answer vectors were finite and preserved the original predictions; all 476 stored Base vectors were finite. Both models passed the real all-audio identity check with zero score difference. Guarded generation reproduced 24 sampled 3B focus prefixes/selections and four sampled scan outcomes; this was a sampled generation audit, not full regeneration of every historical declaration. 131 tests passed.
+
+The initial 7B FP16 attempt produced NaN scores and its 179-pair cohort is invalid. Those artifacts are archived outside the valid result tree. The valid BF16 capability result is speech-only 56.67%, event-only 99.58%, eligible 271/480. See [NUMERICAL_FIX.md](NUMERICAL_FIX.md).
+
+See [3B stage summaries](3b/SUMMARY.md), [protocol and reusable commands](PROTOCOL.md), [full 3B score audit](3b_numerical_audit.json), and [guarded generation sample audit](3b_guarded_generation_audit.json). This remains a post-hoc development-set mechanism experiment, not a held-out confirmation.

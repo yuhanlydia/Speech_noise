@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "numerical_guards_active": true,
+  "focus_rows": 24,
+  "scan_pairs": 4,
+  "focus_prefixes_and_selections_match": true,
+  "scan_text_and_parser_outcomes_match": true,
+  "scope": "Sampled generation checks, plus separate full capability/answer-vector audit; not a full regeneration of all historical declarations."
+}
