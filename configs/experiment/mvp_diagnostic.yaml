@@ -5,7 +5,7 @@ model:
   device_map: auto
   attention_backend: eager
 data:
-  manifest: data/mvp/pairs.jsonl
+  manifest: data/mvp/pairs_eligible.jsonl
   seed: 0
 method:
   name: base
