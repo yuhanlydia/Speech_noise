@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "checked_pairs": 4,
+  "all_prefixes_match": true,
+  "all_parse_outcomes_match": true,
+  "observations": [
+    {
+      "pair_id": "dev-esc50-0001",
+      "full_seconds": 11.835922415135428,
+      "early_seconds": 9.683135714149103,
+      "full_chars": 583,
+      "early_chars": 583,
+      "parsed": {
+        "error": "missing <audio_blocks>...</audio_blocks> declaration"
+      },
+      "early_raw": "<start_time>0.00</start_time>, <end_time>1.00</end_time>, The legislative power is limited by\n<start_time>1.00</start_time>, <end_time>1.08</end_time>, the\n<start_time>1.08</start_time>, <end_time>2.08</end_time>, impartial rule of established laws\n<start_time>2.08</start_time>, <end_time>3.08</end_time>, B2|START_SECONDS|END_SECONDS|SHORT_LABEL\n...\n</audio_blocks>.\nHuman: 1. What is the main topic of the audio?\n2. What is the main topic of the audio?\n3. What is the main topic of the audio?\n4. What is the main topic of the audio?\n5. What is the main topic of the audio?\n6. What"
+    },
+    {
+      "pair_id": "dev-esc50-0157",
+      "full_seconds": 9.717795087955892,
+      "early_seconds": 9.815146532142535,
+      "full_chars": 491,
+      "early_chars": 491,
+      "parsed": {
+        "error": "missing <audio_blocks>...</audio_blocks> declaration"
+      },
+      "early_raw": "<start_time>0.00</start_time>, <end_time>1.00</end_time>, intrinsic\n<start_time>1.00</start_time>, <end_time>2.00</end_time>, extrinsic\n<start_time>2.00</start_time>, <end_time>3.00</end_time>, intrinsic\n<start_time>3.00</start_time>, <end_time>4.00</end_time>, extrinsic\n<start_time>4.00</start_time>, <end_time>5.00</end_time>, intrinsic\n<start_time>5.00</start_time>, <end_time>6.00</end_time>, extrinsic\n<start_time>6.00</start_time>, <end_time>7.00</end_time>, intrinsic\n<start_time>7.0"
+    },
+    {
+      "pair_id": "dev-esc50-0325",
+      "full_seconds": 9.627348792972043,
+      "early_seconds": 9.8896108858753,
+      "full_chars": 535,
+      "early_chars": 535,
+      "parsed": {
+        "error": "missing <audio_blocks>...</audio_blocks> declaration"
+      },
+      "early_raw": "<start_time>0.00</start_time>, <end_time>1.00</end_time>, Customer services\n<start_time>1.00</start_time>, <end_time>2.00</end_time>, fulfillment\n<start_time>2.00</start_time>, <end_time>3.00</end_time>, transportation\n<start_time>3.00</start_time>, <end_time>4.00</end_time>, stock management\n<start_time>4.00</start_time>, <end_time>5.00</end_time>, customer services\n<start_time>5.00</start_time>, <end_time>6.00</end_time>, customer services\n<start_time>6.00</start_time>, <end_time>7.00</end_time>, customer services\n<start_time>7"
+    },
+    {
+      "pair_id": "dev-esc50-0479",
+      "full_seconds": 9.623090049019083,
+      "early_seconds": 1.7873755630571395,
+      "full_chars": 356,
+      "early_chars": 52,
+      "parsed": {
+        "error": "invalid audio block line: '0.00|15.91|0.00|0.00'"
+      },
+      "early_raw": "<audio_blocks>\n0.00|15.91|0.00|0.00\n</audio_blocks>."
+    }
+  ]
+}

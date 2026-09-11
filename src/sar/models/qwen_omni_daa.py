@@ -23,6 +23,8 @@ from sar.models.qwen_omni import QwenOmniWrapper
 class QwenOmniDAAWrapper(QwenOmniWrapper):
     """Declarative Acoustic Attention extension for the Qwen2.5-Omni Thinker."""
 
+    stop_on_complete_declaration = False
+
     @staticmethod
     def focus_tag(selected_ids: Sequence[str]) -> str:
         if not selected_ids:
@@ -48,17 +50,27 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
             "Answer the question using the available acoustic evidence."
         )
 
-    def generate_text(self, audio_path: str, prompt: str, *, max_new_tokens: int) -> str:
+    def generate_text(self, audio_path: str, prompt: str, *, max_new_tokens: int,
+                      declaration_kind: str | None = None) -> str:
         if self.model is None or self.processor is None:
             raise RuntimeError("call load() before generation")
         inputs = self.prepare_inputs(audio_path, prompt)
         prompt_len = int(inputs["input_ids"].shape[1])
+        generation_kwargs = {}
+        if self.stop_on_complete_declaration and declaration_kind is not None:
+            from transformers import StoppingCriteriaList
+            from sar.generation_stopping import DeclarationStoppingCriteria
+
+            generation_kwargs["stopping_criteria"] = StoppingCriteriaList([
+                DeclarationStoppingCriteria(self.processor.tokenizer, prompt_len, declaration_kind)
+            ])
         with torch.no_grad():
             output_ids = self.model.generate(
                 **inputs,
                 max_new_tokens=max_new_tokens,
                 do_sample=False,
                 use_cache=True,
+                **generation_kwargs,
             )
         generated = output_ids[0, prompt_len:]
         return self.processor.tokenizer.decode(
@@ -78,6 +90,7 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
             audio_path,
             format_scan_prompt(duration_s=duration_s, max_blocks=max_blocks),
             max_new_tokens=max_new_tokens,
+            declaration_kind="blocks",
         )
         blocks = parse_audio_blocks(
             raw,
@@ -99,6 +112,7 @@ class QwenOmniDAAWrapper(QwenOmniWrapper):
             audio_path,
             format_focus_prompt(query, blocks, max_selected=max_selected),
             max_new_tokens=max_new_tokens,
+            declaration_kind="focus",
         )
         selected = parse_focus_declaration(
             raw,

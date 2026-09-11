@@ -31,6 +31,7 @@ class DAAConfig(StrictModel):
     block_strategy: Literal["declared", "fixed"] = "fixed"
     focus_source: Literal["model", "oracle"] = "model"
     apply_kv_mask: bool = True
+    stop_on_complete_declaration: bool = False
     block_seconds: float = Field(default=1.5, gt=0)
     max_blocks: int = Field(default=8, ge=1)
     max_focus_blocks: int = Field(default=8, ge=1)

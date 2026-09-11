@@ -1,0 +1,19 @@
+model:
+  model_id: Qwen/Qwen2.5-Omni-7B
+  quantization: nf4
+  thinker_only: true
+  device_map: auto
+  attention_backend: eager
+data:
+  manifest: data/mvp_expanded_480/pairs.jsonl
+  seed: 0
+method:
+  name: base
+  layers:
+  - 0
+  router_dim: 32
+  lambda_switch: 0.0
+  lambda_identity: 0.0
+  checkpoint: null
+output_dir: results/v2_full_matrix/7b/mvp_capability_gate
+seed: 0

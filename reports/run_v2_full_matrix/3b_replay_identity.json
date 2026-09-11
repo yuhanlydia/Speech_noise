@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "all_cohort_declarations_match": true,
+  "num_matched_rows": 476,
+  "num_recomputed_rows": 24,
+  "predictions_match": true,
+  "historical_logprobs_available": false,
+  "source_failure_rows": 0,
+  "source_failure_audit": "Only focus declaration parser failures permitted",
+  "receipt_note": "Existing 3B independent jobs started before producer receipts were added. This integration check directly compares their recorded declarations and fresh replay predictions (historical scores were not exported); it does not fabricate a producer receipt."
+}

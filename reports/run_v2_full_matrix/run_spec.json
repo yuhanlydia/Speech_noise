@@ -1,0 +1,22 @@
+{
+  "source_head": "0b63017d48268b5870c9b9dd8ee51a05e281ae38",
+  "user_override": "All performance-based early stopping rules removed. Complete the full comparison matrix and report positive, neutral and negative outcomes. Correctness failures require debugging, not scientific termination.",
+  "dataset": "data/mvp_expanded_480",
+  "num_pairs": 480,
+  "seed": 0,
+  "protocol": "dev",
+  "models": {
+    "3b": "Qwen/Qwen2.5-Omni-3B",
+    "7b": "Qwen/Qwen2.5-Omni-7B"
+  },
+  "reused_3b_stages": [
+    "data_audit",
+    "mvp_capability_gate",
+    "daa_identity",
+    "mvp_diagnostic"
+  ],
+  "reused_from": "results/v2_expanded_480",
+  "historical_reports_preserved": true,
+  "independent_confirmation": false,
+  "eligibility_policy": "Model-specific isolated capability cohorts for main metrics; also report shared-eligible comparisons. Do not interpret cohort differences as causal model improvements."
+}

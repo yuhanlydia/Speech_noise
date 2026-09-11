@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "num_pairs": 480,
+  "num_errors": 0,
+  "errors": [],
+  "mixed_duration_mean_s": 19.560703125,
+  "mixed_duration_max_s": 37.35225,
+  "gap_mean_s": 0.35000000000000003,
+  "full_audit_path": "results/v2_full_matrix/3b/data_audit/summary.json",
+  "full_audit_sha256": "6f9d76092a567b8b8ba4c5b818be5659ddc478aa3878badd70b0841852975d2c"
+}

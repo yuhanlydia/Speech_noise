@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from typing import Callable
@@ -57,6 +58,8 @@ def _build_wrapper(cfg: ExperimentConfig):
         )
     )
     wrapper.load()
+    if cfg.method.daa is not None:
+        wrapper.stop_on_complete_declaration = cfg.method.daa.stop_on_complete_declaration
     return wrapper
 
 
@@ -89,6 +92,7 @@ def evaluate_daa_with_wrapper(
     records: list[RelevancePairRecord],
     *,
     duration_resolver: Callable[[str], float] = _duration_s,
+    progress: Callable[[int, int], None] | None = None,
 ) -> tuple[list[dict], dict]:
     if cfg.method.name != "daa" or cfg.method.daa is None:
         raise ValueError("evaluate_daa_with_wrapper requires method.name=daa")
@@ -99,7 +103,7 @@ def evaluate_daa_with_wrapper(
     stage_counts: dict[str, int] = {}
     daa = cfg.method.daa
 
-    for pair in pairs.values():
+    for index, pair in enumerate(pairs.values(), 1):
         pair_records = [pair["ignore"], pair["use"]]
         try:
             pair_rows = run_daa_pair(
@@ -122,6 +126,8 @@ def evaluate_daa_with_wrapper(
             stage_counts[exc.stage] = stage_counts.get(exc.stage, 0) + 1
             pair_rows = _failure_rows(pair_records, exc)
         rows.extend(pair_rows)
+        if progress is not None:
+            progress(index, len(pairs))
 
     summary = summarize_daa_rows(rows)
     summary["protocol_failure_pairs"] = float(failed_pairs)
@@ -135,12 +141,30 @@ def evaluate_daa_with_wrapper(
     return rows, summary
 
 
+def record_manifest_sha256(records) -> str:
+    payload = json.dumps(
+        [record.model_dump(mode="json") for record in records],
+        sort_keys=True, separators=(",", ":"), ensure_ascii=False,
+    ).encode()
+    return hashlib.sha256(payload).hexdigest()
+
+
 def evaluate_daa(cfg: ExperimentConfig) -> tuple[list[dict], dict]:
     records = load_jsonl_records(cfg.data.manifest)
     validate_pair_records(records)
+    metadata = {"config": cfg.model_dump(mode="json"),
+                "records_sha256": record_manifest_sha256(records)}
     wrapper = _build_wrapper(cfg)
-    rows, summary = evaluate_daa_with_wrapper(cfg, wrapper, records)
+    rows, summary = evaluate_daa_with_wrapper(
+        cfg, wrapper, records,
+        progress=lambda i, n: print(f"DAA pairs {i}/{n}", flush=True)
+        if i % 10 == 0 or i == n else None,
+    )
     write_results(rows, summary, cfg.output_dir)
+    metadata["results_sha256"] = hashlib.sha256(
+        (Path(cfg.output_dir) / "results.jsonl").read_bytes()
+    ).hexdigest()
+    (Path(cfg.output_dir) / "run_metadata.json").write_text(json.dumps(metadata, indent=2))
     return rows, summary
 
 
